@@ -44,7 +44,7 @@ a {
 
 .nav {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(0, 3fr);
+  grid-template-columns: 1.4fr repeat(5, minmax(0, 1fr));
   align-items: center;
   gap: 30px;
   padding: 28px 0;
@@ -70,26 +70,18 @@ a {
   letter-spacing: 0.08em;
 }
 .nav-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 9px;
+  display: contents;
   color: var(--muted);
   font-size: 0.7rem;
 }
 .desktop-nav-links {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
-  max-width: 430px;
-  gap: 18px;
+  display: contents;
 }
 .desktop-nav-links a {
   color: var(--green-dark);
   font-size: 0.7rem;
   font-weight: 600;
+  text-align: center;
   text-decoration: none;
 }
 .desktop-nav-links a:hover,
@@ -97,8 +89,9 @@ a {
   color: var(--orange);
 }
 .nav-wallet-link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   color: var(--green-dark);
   font-size: 0.7rem;
@@ -186,7 +179,8 @@ a {
   font-size: 0.85rem;
 }
 .desktop-theme-toggle {
-  display: block;
+  display: flex;
+  justify-content: center;
 }
 .mobile-menu-panel .theme-toggle {
   justify-content: flex-start;
@@ -546,6 +540,10 @@ h1 {
   .shell {
     width: min(100% - 32px, 560px);
   }
+  .nav {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+  }
   .hero {
     grid-template-columns: 1fr;
     gap: 60px;
@@ -561,6 +559,7 @@ h1 {
     display: none;
   }
   .nav-meta {
+    display: flex;
     justify-content: flex-end;
   }
   .nav-wallet-link {
