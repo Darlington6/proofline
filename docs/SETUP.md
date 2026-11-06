@@ -92,6 +92,23 @@ The simulation panel accepts an unsigned, base64-encoded transaction payload. It
 
 Historical transaction signatures cannot be simulated retroactively. The prepared self-transfer is addressed from and back to the connected Devnet wallet so it is safe to inspect without moving funds.
 
+## Optional AI Explanations
+
+Proofline works without a model provider. In that mode, the application uses its deterministic rules engine and labels the result **Rules-based explanation**.
+
+To enable model-backed explanations:
+
+1. Create an account with an OpenAI-compatible provider and create an API key from its dashboard.
+2. Keep the key only in your local `.env` file. Do not paste it into the browser, source code, GitHub, or a chat message.
+3. Add the values below and restart `npm run dev`:
+
+   ```env
+   OPENAI_API_KEY=your_private_key
+   OPENAI_MODEL=gpt-4o-mini
+   ```
+
+The key is read only by the server-side `/api/explain` route. Check the provider's pricing and usage limits before enabling it. An API key is not required for the hackathon demo because the rules-based path remains available.
+
 ## Approval Needed Before Implementation
 
 - Product concept and primary user

@@ -64,8 +64,9 @@ function WalletButtonContent() {
           key={wallet.name}
           type="button"
           onClick={() => connect(wallet)}
+          aria-label={`Connect ${wallet.name}`}
         >
-          Connect {wallet.name} <span aria-hidden="true">↗</span>
+          Connect wallet <span aria-hidden="true">↗</span>
         </button>
       ))}
     </div>

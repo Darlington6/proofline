@@ -34,7 +34,16 @@ export default function Home() {
         <div className="nav-meta">
           <span className="network-dot" aria-hidden="true" />
           Devnet preview
-          <ThemeToggle />
+          <div className="nav-actions">
+            <WalletButton />
+            <a
+              className="nav-link"
+              href="https://solana.com/docs/intro/quick-start"
+            >
+              Quick Start <span aria-hidden="true">↗</span>
+            </a>
+            <ThemeToggle />
+          </div>
         </div>
       </nav>
 
@@ -47,15 +56,6 @@ export default function Home() {
             Read the instructions, see the risk, simulate the outcome, then
             decide.
           </p>
-          <div className="hero-actions">
-            <WalletButton />
-            <a
-              className="text-link"
-              href="https://solana.com/docs/intro/quick-start"
-            >
-              Read the Solana quick start <span aria-hidden="true">→</span>
-            </a>
-          </div>
         </div>
         <div className="review-panel" aria-label="Example transaction review">
           <div className="panel-topline">
@@ -94,10 +94,6 @@ export default function Home() {
         </div>
       </section>
 
-      <TransactionReview />
-
-      <SimulationPanel />
-
       <section className="workflow shell" aria-labelledby="workflow-title">
         <div className="section-heading">
           <p className="eyebrow">The first workflow</p>
@@ -113,6 +109,10 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <SimulationPanel />
+
+      <TransactionReview />
 
       <footer className="footer shell">
         <span>Proofline / Solana Hackathon 2026</span>

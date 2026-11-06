@@ -76,6 +76,22 @@ a {
   color: var(--muted);
   font-size: 0.7rem;
 }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.nav-link {
+  color: var(--green-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.nav-link span {
+  margin-left: 4px;
+  color: var(--orange);
+}
 .theme-toggle {
   display: inline-flex;
   align-items: center;

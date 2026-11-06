@@ -146,12 +146,14 @@ export function analyzeTransaction(
         instruction.parsed?.type ?? "",
       ),
   );
-  const hasUnknownProgram = instructions.some(
-    (instruction) =>
-      instruction.program !== "system" &&
-      instruction.program !== "spl-token" &&
-      instruction.program !== "compute-budget",
-  );
+  const hasUnknownProgram = instructions.some((_instruction, index) => {
+    const program = result.transaction.message.instructions[index]?.program;
+    return (
+      program !== "system" &&
+      program !== "spl-token" &&
+      program !== "compute-budget"
+    );
+  });
   const risks: RiskCategory[] = [
     {
       key: "funds-leaving-wallet",

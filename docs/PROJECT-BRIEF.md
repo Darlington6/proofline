@@ -49,6 +49,15 @@ No custom Solana program is planned for the first milestone. We will use RPC sim
 
 An Anchor program is a stretch goal only if we add an on-chain proof receipt containing a transaction hash, AI explanation hash, wallet, timestamp, and final signature. It must not delay the core workflow.
 
+### Current milestone status
+
+- Devnet Wallet Standard connection: complete
+- Unsigned transfer preparation and RPC simulation: complete
+- Structured risk categories and rules-based explanation: complete
+- Optional model-backed explanation endpoint: complete, requires a local API key
+- Explicit Devnet signing and Explorer result: complete
+- On-chain proof receipt program: not revisited yet; remains a post-MVP stretch goal
+
 ## Definition Of Done For The Foundation
 
 - A named product with a specific first user
