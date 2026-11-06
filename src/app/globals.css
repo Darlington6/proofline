@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 :root {
+  color-scheme: light;
   --ink: #17211b;
   --muted: #68756c;
   --paper: #f3f5ef;
@@ -10,6 +11,8 @@
   --green-dark: #1d4e36;
   --lime: #d7f071;
   --orange: #e78350;
+  --glass: rgba(251, 252, 248, 0.72);
+  --glass-shadow: rgba(23, 33, 27, 0.08);
 }
 
 * {
@@ -371,5 +374,200 @@ h1 {
   .footer {
     display: grid;
     gap: 10px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #edf2eb;
+    --muted: #aeb9af;
+    --paper: #17201a;
+    --cream: #202a22;
+    --line: #39463c;
+    --green: #88c69f;
+    --green-dark: #d7eddb;
+    --lime: #bfd66b;
+    --orange: #f0a274;
+    --glass: rgba(32, 42, 34, 0.72);
+    --glass-shadow: rgba(0, 0, 0, 0.22);
+  }
+}
+
+.transaction-review {
+  padding: 0 0 110px;
+}
+.review-form-layout {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1fr);
+  gap: 20px;
+  padding-top: 28px;
+}
+.glass-panel {
+  background: var(--glass);
+  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+  box-shadow: 0 18px 45px var(--glass-shadow);
+  backdrop-filter: blur(18px);
+}
+.signature-form,
+.analysis-panel {
+  min-height: 260px;
+  padding: 25px;
+}
+.signature-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--green-dark);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.signature-form p {
+  max-width: 280px;
+  margin-bottom: 25px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.signature-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.signature-input-row input {
+  min-width: 0;
+  padding: 14px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.75rem;
+}
+.signature-input-row input:focus {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.signature-input-row button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.form-error {
+  margin: 18px 0 0 !important;
+  color: #b84d3f !important;
+}
+.empty-analysis {
+  display: grid;
+  min-height: 208px;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  text-align: center;
+}
+.empty-analysis p {
+  max-width: 210px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.analysis-mark {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--green-dark);
+  background: var(--lime);
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+.analysis-header,
+.analysis-stats {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.analysis-header h3 {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: 1.15rem;
+}
+.analysis-header .panel-kicker {
+  margin-bottom: 7px;
+}
+.risk-badge {
+  padding: 6px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+.risk-low {
+  color: var(--green);
+}
+.risk-medium {
+  color: var(--orange);
+}
+.risk-high {
+  color: #c85a4c;
+}
+.analysis-summary {
+  margin: 22px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+.analysis-stats {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+.analysis-stats strong {
+  margin-left: 5px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.instruction-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+.instruction-list li {
+  display: grid;
+  gap: 5px;
+  padding-left: 12px;
+  border-left: 2px solid var(--lime);
+}
+.instruction-list span {
+  color: var(--green-dark);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.instruction-list small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+.simulation-note {
+  margin: 0;
+  color: var(--orange);
+  font-family: "DM Mono", monospace;
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .review-form-layout {
+    grid-template-columns: 1fr;
+  }
+  .signature-input-row {
+    grid-template-columns: 1fr;
   }
 }

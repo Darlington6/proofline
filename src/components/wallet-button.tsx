@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import {
   useConnectedWallet,
   useConnect,
@@ -56,6 +57,16 @@ function WalletButtonContent() {
 }
 
 export function WalletButton() {
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  if (!isHydrated) {
+    return <span className="wallet-hint">Looking for wallets...</span>;
+  }
+
   return (
     <WalletReadyGate
       client={client}

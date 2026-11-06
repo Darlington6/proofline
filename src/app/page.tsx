@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WalletButton } from "@/components/wallet-button";
+import { TransactionReview } from "@/components/transaction-review";
 
 const workflow = [
   {
@@ -89,6 +90,8 @@ export default function Home() {
           </button>
         </div>
       </section>
+
+      <TransactionReview />
 
       <section className="workflow shell" aria-labelledby="workflow-title">
         <div className="section-heading">
