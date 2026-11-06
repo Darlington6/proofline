@@ -19,6 +19,7 @@ The official Solana installation guide is the source of truth for platform-speci
 - [Developer Templates](https://solana.com/developers/templates)
 - [Solana Skills](https://solana.com/skills)
 - [Blueshift learning courses](https://learn.blueshift.gg/en)
+- [Official frontend skill: Solana Kit + Wallet Standard](https://github.com/solana-foundation/solana-dev-skill/blob/main/skills/solana-dev/references/frontend.md)
 
 ## Recommended Initial Sequence
 
@@ -42,7 +43,7 @@ The official Solana installation guide is the source of truth for platform-speci
 
 4. Fund the development wallet from the [Solana Devnet Faucet](https://faucet.solana.com/).
 5. Never commit wallet keypairs, seed phrases, private keys, or `.env` files.
-6. Choose the frontend and program template only after the project brief is approved.
+6. The frontend uses Solana Kit with Wallet Standard discovery; do not add the legacy `@solana/wallet-adapter-*` packages.
 
 ## Local Environment
 
@@ -64,6 +65,7 @@ Keep local values out of Git. Public RPC URLs and wallet addresses may be safe t
 - [ ] Devnet wallet address is known
 - [ ] Devnet wallet has test SOL
 - [ ] No secrets are tracked by Git
+- [ ] A Wallet Standard wallet is installed in the browser for wallet UI testing
 
 ## Approval Needed Before Implementation
 

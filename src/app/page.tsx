@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WalletButton } from "@/components/wallet-button";
 
 const workflow = [
   {
@@ -43,9 +44,7 @@ export default function Home() {
             decide.
           </p>
           <div className="hero-actions">
-            <button className="primary-button" type="button">
-              Connect wallet <span aria-hidden="true">↗</span>
-            </button>
+            <WalletButton />
             <a
               className="text-link"
               href="https://solana.com/docs/intro/quick-start"
