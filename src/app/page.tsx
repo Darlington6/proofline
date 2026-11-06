@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { WalletButton } from "@/components/wallet-button";
 import { TransactionReview } from "@/components/transaction-review";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { SimulationPanel } from "@/components/simulation-panel";
 
 const workflow = [
   {
@@ -32,6 +34,7 @@ export default function Home() {
         <div className="nav-meta">
           <span className="network-dot" aria-hidden="true" />
           Devnet preview
+          <ThemeToggle />
         </div>
       </nav>
 
@@ -92,6 +95,8 @@ export default function Home() {
       </section>
 
       <TransactionReview />
+
+      <SimulationPanel />
 
       <section className="workflow shell" aria-labelledby="workflow-title">
         <div className="section-heading">
