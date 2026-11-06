@@ -39,6 +39,15 @@ export default function Home() {
             <a href="#simulation">Safety check</a>
             <a href="#review">Review</a>
           </div>
+          <a
+            className="nav-wallet-link"
+            href="#hero-actions"
+            aria-label="Go to wallet connection"
+            title="Connect wallet"
+          >
+            <span aria-hidden="true">◈</span>
+            <span>Wallet</span>
+          </a>
           <div className="desktop-theme-toggle">
             <ThemeToggle />
           </div>
@@ -87,11 +96,11 @@ export default function Home() {
               signing.
             </p>
           </div>
-          <button className="simulate-button" type="button">
+          <a className="simulate-button" href="#simulation">
             Simulate transaction
-          </button>
+          </a>
         </div>
-        <div className="hero-actions">
+        <div className="hero-actions" id="hero-actions">
           <WalletButton />
           <a
             className="text-link"

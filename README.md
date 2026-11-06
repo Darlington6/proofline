@@ -25,6 +25,8 @@ This repository contains the initial project brief, local setup documentation, a
 
 Read [docs/SETUP.md](docs/SETUP.md) before installing tooling. Then review [docs/PROJECT-BRIEF.md](docs/PROJECT-BRIEF.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the frontend, server route handlers, RPC flow, and trust boundaries.
+
 ## Hackathon Constraints
 
 - Event: Solana Hackathon

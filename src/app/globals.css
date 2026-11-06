@@ -43,9 +43,10 @@ a {
 }
 
 .nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 3fr);
   align-items: center;
-  justify-content: space-between;
+  gap: 30px;
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
 }
@@ -71,6 +72,7 @@ a {
 .nav-meta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 9px;
   color: var(--muted);
@@ -79,7 +81,10 @@ a {
 .desktop-nav-links {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  flex: 1;
+  max-width: 430px;
+  gap: 18px;
 }
 .desktop-nav-links a {
   color: var(--green-dark);
@@ -89,6 +94,23 @@ a {
 }
 .desktop-nav-links a:hover,
 .desktop-nav-links a:focus-visible {
+  color: var(--orange);
+}
+.nav-wallet-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.nav-wallet-link > span:first-child {
+  color: var(--orange);
+  font-size: 1rem;
+}
+.nav-wallet-link:hover,
+.nav-wallet-link:focus-visible {
   color: var(--orange);
 }
 .mobile-menu {
@@ -393,10 +415,13 @@ h1 {
   line-height: 1.5;
 }
 .simulate-button {
+  display: block;
   width: 100%;
   padding: 14px;
   color: var(--green-dark);
   background: var(--lime);
+  text-align: center;
+  text-decoration: none;
 }
 
 .workflow {
@@ -537,6 +562,9 @@ h1 {
   }
   .nav-meta {
     justify-content: flex-end;
+  }
+  .nav-wallet-link {
+    display: none;
   }
   .hero-actions {
     grid-template-columns: 1fr;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const links = [
@@ -11,9 +11,24 @@ const links = [
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function closeOnOutsideClick(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+  }, [isOpen]);
 
   return (
-    <div className="mobile-menu">
+    <div className="mobile-menu" ref={menuRef}>
       <button
         className="menu-button"
         type="button"
