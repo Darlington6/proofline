@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   address,
   appendTransactionMessageInstruction,
@@ -18,6 +18,22 @@ import { getTransferSolInstruction } from "@solana-program/system";
 import { useConnectedWallet } from "@solana/kit-plugin-wallet/react";
 import { client } from "@/app/providers";
 
+const hydrationEvent = "proofline-simulation-hydrated";
+let hasHydrated = false;
+
+function subscribeToHydration(callback: () => void) {
+  window.addEventListener(hydrationEvent, callback);
+  return () => window.removeEventListener(hydrationEvent, callback);
+}
+
+function getHydrationSnapshot() {
+  return hasHydrated;
+}
+
+function getServerHydrationSnapshot() {
+  return false;
+}
+
 type SimulationResult = {
   err: unknown;
   logs: string[];
@@ -25,6 +41,11 @@ type SimulationResult = {
 };
 
 export function SimulationPanel() {
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
   const [transaction, setTransaction] = useState("");
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [error, setError] = useState("");
@@ -32,6 +53,11 @@ export function SimulationPanel() {
   const [isPreparing, setIsPreparing] = useState(false);
 
   const connected = useConnectedWallet(client);
+
+  useEffect(() => {
+    hasHydrated = true;
+    window.dispatchEvent(new Event(hydrationEvent));
+  }, []);
 
   async function prepareTransfer() {
     if (!connected) return;
@@ -145,13 +171,15 @@ export function SimulationPanel() {
             className="secondary-button"
             type="button"
             onClick={prepareTransfer}
-            disabled={!connected || isPreparing}
+            disabled={!isHydrated || !connected || isPreparing}
           >
-            {isPreparing
-              ? "Preparing..."
-              : connected
-                ? "Prepare 0.001 SOL self-transfer"
-                : "Connect wallet to prepare a transfer"}
+            {!isHydrated
+              ? "Looking for wallet..."
+              : isPreparing
+                ? "Preparing..."
+                : connected
+                  ? "Prepare 0.001 SOL self-transfer"
+                  : "Connect wallet to prepare a transfer"}
           </button>
           <button
             className="primary-button"
