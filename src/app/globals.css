@@ -693,6 +693,91 @@ html[data-theme="dark"] {
 .simulation-error {
   color: #c85a4c;
 }
+.risk-list,
+.finding-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+.risk-list li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+.risk-list div {
+  display: grid;
+  gap: 3px;
+}
+.risk-list strong {
+  color: var(--green-dark);
+  font-size: 0.76rem;
+}
+.risk-list small,
+.finding-list li {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+.risk-dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+.risk-dot-clear {
+  background: var(--green);
+}
+.risk-dot-review {
+  background: var(--orange);
+}
+.risk-dot-high {
+  background: #c85a4c;
+}
+.explanation-panel {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.explanation-panel h3 {
+  margin: 8px 0 0;
+  color: var(--green-dark);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.finding-list li {
+  padding-left: 12px;
+  border-left: 2px solid var(--lime);
+}
+.approve-button {
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  color: var(--cream);
+  background: var(--green-dark);
+  border: 0;
+  border-radius: 2px;
+  font-weight: 600;
+}
+.approve-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.sent-result {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  color: var(--green);
+  font-size: 0.8rem;
+}
+.sent-result a {
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
 @media (max-width: 760px) {
   .simulation-layout {
     grid-template-columns: 1fr;

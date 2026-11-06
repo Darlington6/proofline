@@ -15,8 +15,13 @@ import {
   solToLamports,
 } from "@solana/kit";
 import { getTransferSolInstruction } from "@solana-program/system";
+import { useSendTransaction } from "@solana/react";
 import { useConnectedWallet } from "@solana/kit-plugin-wallet/react";
 import { client } from "@/app/providers";
+import {
+  createPreparedTransferAnalysis,
+  type TransactionAnalysis,
+} from "@/lib/transaction-analysis";
 
 const hydrationEvent = "proofline-simulation-hydrated";
 let hasHydrated = false;
@@ -40,6 +45,13 @@ type SimulationResult = {
   unitsConsumed: number | null;
 };
 
+type Explanation = {
+  provider: "rules" | "openai";
+  summary: string;
+  recommendation: string;
+  findings: string[];
+};
+
 export function SimulationPanel() {
   const isHydrated = useSyncExternalStore(
     subscribeToHydration,
@@ -51,8 +63,20 @@ export function SimulationPanel() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [explanation, setExplanation] = useState<Explanation | null>(null);
+  const [explanationError, setExplanationError] = useState("");
+  const [preparedAnalysis, setPreparedAnalysis] =
+    useState<TransactionAnalysis | null>(null);
 
   const connected = useConnectedWallet(client);
+  const {
+    dispatch: sendTransfer,
+    isRunning: isSending,
+    data: sentData,
+    error: sendError,
+  } = useSendTransaction(client);
+  const canSendV1 = connected?.supportedTransactionVersions.has(1) ?? false;
 
   useEffect(() => {
     hasHydrated = true;
@@ -65,9 +89,14 @@ export function SimulationPanel() {
     setIsPreparing(true);
     setError("");
     setResult(null);
+    setExplanation(null);
+    setExplanationError("");
 
     try {
       const walletAddress = address(connected.account.address);
+      setPreparedAnalysis(
+        createPreparedTransferAnalysis(connected.account.address),
+      );
       const { value: latestBlockhash } = await client.rpc
         .getLatestBlockhash({ commitment: "confirmed" })
         .send();
@@ -105,11 +134,50 @@ export function SimulationPanel() {
     }
   }
 
+  async function explainResult(
+    analysis: TransactionAnalysis,
+    simulation: SimulationResult,
+  ) {
+    setIsExplaining(true);
+    setExplanationError("");
+
+    try {
+      const response = await fetch("/api/explain", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ analysis, simulation }),
+      });
+      const payload = (await response.json()) as
+        Explanation | { error?: string };
+
+      if (!response.ok) {
+        const message = "error" in payload ? payload.error : undefined;
+        throw new Error(message ?? "Unable to explain transaction.");
+      }
+
+      if (!("provider" in payload)) {
+        throw new Error(payload.error ?? "Unable to explain transaction.");
+      }
+
+      setExplanation(payload);
+    } catch (requestError) {
+      setExplanationError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to explain transaction.",
+      );
+    } finally {
+      setIsExplaining(false);
+    }
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setError("");
     setResult(null);
+    setExplanation(null);
+    setExplanationError("");
 
     try {
       const response = await fetch("/api/transactions/simulate", {
@@ -130,6 +198,9 @@ export function SimulationPanel() {
       }
 
       setResult(payload);
+      if (preparedAnalysis) {
+        await explainResult(preparedAnalysis, payload);
+      }
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -140,6 +211,28 @@ export function SimulationPanel() {
       setIsLoading(false);
     }
   }
+
+  function approveAndSign() {
+    if (
+      !connected ||
+      !preparedAnalysis ||
+      !result ||
+      result.err ||
+      !explanation
+    ) {
+      return;
+    }
+
+    sendTransfer([
+      getTransferSolInstruction({
+        source: client.payer,
+        destination: address(connected.account.address),
+        amount: solToLamports(sol("0.001")),
+      }),
+    ]);
+  }
+
+  const sentSignature = sentData?.context.signature;
 
   return (
     <section
@@ -239,6 +332,86 @@ export function SimulationPanel() {
               ) : null}
               {result.logs.length > 0 ? (
                 <pre className="simulation-logs">{result.logs.join("\n")}</pre>
+              ) : null}
+              {preparedAnalysis ? (
+                <ul className="risk-list">
+                  {preparedAnalysis.risks.map((risk) => (
+                    <li key={risk.key}>
+                      <span className={`risk-dot risk-dot-${risk.severity}`} />
+                      <div>
+                        <strong>{risk.label}</strong>
+                        <small>{risk.detail}</small>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+          {isExplaining ? (
+            <p className="simulation-note">
+              Preparing transaction explanation...
+            </p>
+          ) : null}
+          {explanation ? (
+            <div className="explanation-panel">
+              <p className="panel-kicker">
+                {explanation.provider === "openai"
+                  ? "AI explanation"
+                  : "Rules-based explanation"}
+              </p>
+              <h3>{explanation.summary}</h3>
+              <p className="analysis-summary">{explanation.recommendation}</p>
+              <ul className="finding-list">
+                {explanation.findings.map((finding) => (
+                  <li key={finding}>{finding}</li>
+                ))}
+              </ul>
+              {!sentSignature ? (
+                <>
+                  <button
+                    className="approve-button"
+                    type="button"
+                    onClick={approveAndSign}
+                    disabled={
+                      !connected ||
+                      !canSendV1 ||
+                      isSending ||
+                      Boolean(result?.err)
+                    }
+                  >
+                    {isSending ? "Waiting for wallet..." : "Approve and sign"}
+                  </button>
+                  {!canSendV1 && connected ? (
+                    <p className="form-error">
+                      This wallet does not support the transaction version
+                      required by this client.
+                    </p>
+                  ) : null}
+                </>
+              ) : (
+                <div className="sent-result">
+                  <strong>Confirmed on Devnet.</strong>
+                  <a
+                    href={`https://explorer.solana.com/tx/${sentSignature}?cluster=devnet`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View transaction ↗
+                  </a>
+                </div>
+              )}
+              {sendError ? (
+                <p className="form-error" role="alert">
+                  {sendError instanceof Error
+                    ? sendError.message
+                    : "Wallet signing failed."}
+                </p>
+              ) : null}
+              {explanationError ? (
+                <p className="form-error" role="alert">
+                  {explanationError}
+                </p>
               ) : null}
             </div>
           ) : null}
