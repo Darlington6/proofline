@@ -76,21 +76,65 @@ a {
   color: var(--muted);
   font-size: 0.7rem;
 }
-.nav-actions {
+.desktop-nav-links {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 12px;
 }
-.nav-link {
+.desktop-nav-links a {
   color: var(--green-dark);
   font-size: 0.7rem;
   font-weight: 600;
   text-decoration: none;
 }
-.nav-link span {
-  margin-left: 4px;
+.desktop-nav-links a:hover,
+.desktop-nav-links a:focus-visible {
   color: var(--orange);
+}
+.mobile-menu {
+  display: none;
+  position: relative;
+}
+.menu-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  cursor: pointer;
+  color: var(--green-dark);
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.menu-button:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.mobile-menu-panel {
+  position: absolute;
+  z-index: 5;
+  top: 46px;
+  right: 0;
+  display: grid;
+  min-width: 170px;
+  padding: 8px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 45px var(--glass-shadow);
+  backdrop-filter: blur(18px);
+}
+.mobile-menu-panel a {
+  padding: 11px 12px;
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.mobile-menu-panel a:hover,
+.mobile-menu-panel a:focus-visible {
+  background: color-mix(in srgb, var(--lime) 36%, transparent);
 }
 .theme-toggle {
   display: inline-flex;
@@ -163,6 +207,7 @@ h1 {
 .hero-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 22px;
 }
@@ -387,9 +432,64 @@ h1 {
   line-height: 1.6;
 }
 .footer {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--cream) 45%, transparent);
+  border-top: 1px solid var(--line);
+}
+.footer-inner {
+  padding: 54px 0 24px;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding-bottom: 48px;
+}
+.footer-brand p {
+  margin: 18px 0;
+  color: var(--green-dark);
+  font-size: 1rem;
+}
+.footer-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.footer-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.footer-links div {
+  display: grid;
+  align-content: start;
+  gap: 11px;
+}
+.footer-label {
+  margin-bottom: 4px;
+  color: var(--orange);
+  font-family: "DM Mono", monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.footer-links a {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: var(--green-dark);
+}
+.footer-bottom {
   display: flex;
   justify-content: space-between;
-  padding: 24px 0 30px;
+  padding-top: 20px;
   color: var(--muted);
   border-top: 1px solid var(--line);
   font-family: "DM Mono", monospace;
@@ -406,6 +506,19 @@ h1 {
     grid-template-columns: 1fr;
     gap: 60px;
     padding: 72px 0 100px;
+  }
+  .desktop-nav-links {
+    display: none;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .nav-meta {
+    justify-content: flex-end;
+  }
+  .hero-actions {
+    align-items: flex-start;
+    gap: 15px;
   }
   h1 {
     font-size: clamp(3.5rem, 16vw, 5rem);
@@ -435,7 +548,14 @@ h1 {
   .workflow-step h3 {
     margin-top: 18px;
   }
-  .footer {
+  .footer-top,
+  .footer-links {
+    grid-template-columns: 1fr;
+  }
+  .footer-top {
+    gap: 38px;
+  }
+  .footer-bottom {
     display: grid;
     gap: 10px;
   }

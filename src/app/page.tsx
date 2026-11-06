@@ -3,6 +3,7 @@ import { WalletButton } from "@/components/wallet-button";
 import { TransactionReview } from "@/components/transaction-review";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SimulationPanel } from "@/components/simulation-panel";
+import { MobileMenu } from "@/components/mobile-menu";
 
 const workflow = [
   {
@@ -34,16 +35,13 @@ export default function Home() {
         <div className="nav-meta">
           <span className="network-dot" aria-hidden="true" />
           Devnet preview
-          <div className="nav-actions">
-            <WalletButton />
-            <a
-              className="nav-link"
-              href="https://solana.com/docs/intro/quick-start"
-            >
-              Quick Start <span aria-hidden="true">↗</span>
-            </a>
-            <ThemeToggle />
+          <div className="desktop-nav-links">
+            <a href="#workflow">Workflow</a>
+            <a href="#simulation">Safety check</a>
+            <a href="#review">Review</a>
           </div>
+          <ThemeToggle />
+          <MobileMenu />
         </div>
       </nav>
 
@@ -56,6 +54,15 @@ export default function Home() {
             Read the instructions, see the risk, simulate the outcome, then
             decide.
           </p>
+          <div className="hero-actions">
+            <WalletButton />
+            <a
+              className="text-link"
+              href="https://solana.com/docs/intro/quick-start"
+            >
+              Read the Solana quick start <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
         <div className="review-panel" aria-label="Example transaction review">
           <div className="panel-topline">
@@ -94,7 +101,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="workflow shell" aria-labelledby="workflow-title">
+      <section
+        className="workflow shell"
+        id="workflow"
+        aria-labelledby="workflow-title"
+      >
         <div className="section-heading">
           <p className="eyebrow">The first workflow</p>
           <h2 id="workflow-title">A wallet prompt, with context.</h2>
@@ -110,13 +121,51 @@ export default function Home() {
         </div>
       </section>
 
-      <SimulationPanel />
+      <div id="simulation">
+        <SimulationPanel />
+      </div>
 
-      <TransactionReview />
+      <div id="review">
+        <TransactionReview />
+      </div>
 
-      <footer className="footer shell">
-        <span>Proofline / Solana Hackathon 2026</span>
-        <span>AI track · Devnet first</span>
+      <footer className="footer">
+        <div className="footer-inner shell">
+          <div className="footer-top">
+            <div className="footer-brand">
+              <Link className="wordmark" href="/">
+                proof<span>line</span>
+              </Link>
+              <p>Understand before you sign.</p>
+              <span className="footer-status">
+                <span className="network-dot" aria-hidden="true" />
+                Devnet first · AI track
+              </span>
+            </div>
+            <div className="footer-links">
+              <div>
+                <span className="footer-label">Product</span>
+                <a href="#workflow">Workflow</a>
+                <a href="#simulation">Safety check</a>
+                <a href="#review">Review signature</a>
+              </div>
+              <div>
+                <span className="footer-label">Resources</span>
+                <a href="https://solana.com/docs/intro/quick-start">
+                  Solana Quick Start
+                </a>
+                <a href="https://faucet.solana.com/">Devnet Faucet</a>
+                <a href="https://github.com/Darlington6/proofline">
+                  GitHub repository
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>Proofline / Solana Hackathon 2026</span>
+            <span>Built on Solana Devnet</span>
+          </div>
+        </div>
       </footer>
     </main>
   );
