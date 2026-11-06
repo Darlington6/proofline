@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const links = [
   { href: "#workflow", label: "Workflow" },
@@ -34,6 +35,7 @@ export function MobileMenu() {
               {link.label}
             </a>
           ))}
+          <ThemeToggle />
         </div>
       ) : null}
     </div>

@@ -4,6 +4,7 @@ import { TransactionReview } from "@/components/transaction-review";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SimulationPanel } from "@/components/simulation-panel";
 import { MobileMenu } from "@/components/mobile-menu";
+import { CurrentYear } from "@/components/current-year";
 
 const workflow = [
   {
@@ -33,14 +34,14 @@ export default function Home() {
           proof<span>line</span>
         </Link>
         <div className="nav-meta">
-          <span className="network-dot" aria-hidden="true" />
-          Devnet preview
           <div className="desktop-nav-links">
             <a href="#workflow">Workflow</a>
             <a href="#simulation">Safety check</a>
             <a href="#review">Review</a>
           </div>
-          <ThemeToggle />
+          <div className="desktop-theme-toggle">
+            <ThemeToggle />
+          </div>
           <MobileMenu />
         </div>
       </nav>
@@ -54,15 +55,6 @@ export default function Home() {
             Read the instructions, see the risk, simulate the outcome, then
             decide.
           </p>
-          <div className="hero-actions">
-            <WalletButton />
-            <a
-              className="text-link"
-              href="https://solana.com/docs/intro/quick-start"
-            >
-              Read the Solana quick start <span aria-hidden="true">→</span>
-            </a>
-          </div>
         </div>
         <div className="review-panel" aria-label="Example transaction review">
           <div className="panel-topline">
@@ -98,6 +90,15 @@ export default function Home() {
           <button className="simulate-button" type="button">
             Simulate transaction
           </button>
+        </div>
+        <div className="hero-actions">
+          <WalletButton />
+          <a
+            className="text-link"
+            href="https://solana.com/docs/intro/quick-start"
+          >
+            Read the Solana quick start <span aria-hidden="true">→</span>
+          </a>
         </div>
       </section>
 
@@ -162,7 +163,9 @@ export default function Home() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>Proofline / Solana Hackathon 2026</span>
+            <span>
+              Proofline © <CurrentYear /> · All rights reserved.
+            </span>
             <span>Built on Solana Devnet</span>
           </div>
         </div>

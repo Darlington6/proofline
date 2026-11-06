@@ -163,6 +163,13 @@ a {
   color: var(--orange);
   font-size: 0.85rem;
 }
+.desktop-theme-toggle {
+  display: block;
+}
+.mobile-menu-panel .theme-toggle {
+  justify-content: flex-start;
+  margin: 4px;
+}
 .network-dot {
   width: 7px;
   height: 7px;
@@ -205,11 +212,23 @@ h1 {
   line-height: 1.7;
 }
 .hero-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding-top: 4px;
+}
+.hero-actions > .wallet-options,
+.hero-actions > .wallet-status {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 22px;
+  justify-content: flex-start;
+  min-width: 0;
+}
+.hero-actions > .text-link {
+  text-align: right;
 }
 .primary-button,
 .simulate-button {
@@ -513,12 +532,18 @@ h1 {
   .mobile-menu {
     display: block;
   }
+  .desktop-theme-toggle {
+    display: none;
+  }
   .nav-meta {
     justify-content: flex-end;
   }
   .hero-actions {
-    align-items: flex-start;
+    grid-template-columns: 1fr;
     gap: 15px;
+  }
+  .hero-actions > .text-link {
+    text-align: left;
   }
   h1 {
     font-size: clamp(3.5rem, 16vw, 5rem);
