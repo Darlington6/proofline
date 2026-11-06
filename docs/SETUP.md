@@ -88,9 +88,9 @@ Devnet SOL has no mainnet value and is only for development.
 
 ## Testing Simulation
 
-The simulation panel accepts an unsigned, base64-encoded transaction payload. It calls Solana's `simulateTransaction` RPC method with signature verification disabled and does not sign or submit the transaction.
+The simulation panel accepts an unsigned, base64-encoded transaction payload. It calls Solana's `simulateTransaction` RPC method with signature verification disabled and does not sign or submit the transaction. After connecting Phantom, use **Prepare 0.001 SOL self-transfer** to create a simulation-ready payload without signing it.
 
-Historical transaction signatures cannot be simulated retroactively. The next client-side improvement will construct an unsigned transfer from the connected wallet so this step does not require manually preparing base64.
+Historical transaction signatures cannot be simulated retroactively. The prepared self-transfer is addressed from and back to the connected Devnet wallet so it is safe to inspect without moving funds.
 
 ## Approval Needed Before Implementation
 

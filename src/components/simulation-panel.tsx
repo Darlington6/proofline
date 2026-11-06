@@ -1,6 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import {
+  address,
+  appendTransactionMessageInstruction,
+  compileTransaction,
+  createNoopSigner,
+  createTransactionMessage,
+  getBase64EncodedWireTransaction,
+  pipe,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
+  sol,
+  solToLamports,
+} from "@solana/kit";
+import { getTransferSolInstruction } from "@solana-program/system";
+import { useConnectedWallet } from "@solana/kit-plugin-wallet/react";
+import { client } from "@/app/providers";
 
 type SimulationResult = {
   err: unknown;
@@ -13,6 +29,55 @@ export function SimulationPanel() {
   const [result, setResult] = useState<SimulationResult | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  const connected = useConnectedWallet(client);
+
+  async function prepareTransfer() {
+    if (!connected) return;
+
+    setIsPreparing(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const walletAddress = address(connected.account.address);
+      const { value: latestBlockhash } = await client.rpc
+        .getLatestBlockhash({ commitment: "confirmed" })
+        .send();
+      const message = pipe(
+        createTransactionMessage({ version: 0 }),
+        (transaction) =>
+          setTransactionMessageFeePayer(walletAddress, transaction),
+        (transaction) =>
+          setTransactionMessageLifetimeUsingBlockhash(
+            latestBlockhash,
+            transaction,
+          ),
+        (transaction) =>
+          appendTransactionMessageInstruction(
+            getTransferSolInstruction({
+              source: createNoopSigner(walletAddress),
+              destination: walletAddress,
+              amount: solToLamports(sol("0.001")),
+            }),
+            transaction,
+          ),
+      );
+
+      setTransaction(
+        getBase64EncodedWireTransaction(compileTransaction(message)),
+      );
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to prepare transaction.",
+      );
+    } finally {
+      setIsPreparing(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -76,6 +141,18 @@ export function SimulationPanel() {
             spellCheck={false}
             rows={5}
           />
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={prepareTransfer}
+            disabled={!connected || isPreparing}
+          >
+            {isPreparing
+              ? "Preparing..."
+              : connected
+                ? "Prepare 0.001 SOL self-transfer"
+                : "Connect wallet to prepare a transfer"}
+          </button>
           <button
             className="primary-button"
             type="submit"

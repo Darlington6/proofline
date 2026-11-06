@@ -162,6 +162,26 @@ h1 {
   color: var(--cream);
   background: var(--green-dark);
 }
+.secondary-button {
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  color: var(--green-dark);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.secondary-button:hover,
+.secondary-button:focus-visible {
+  border-color: var(--green-dark);
+}
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
 .primary-button span {
   display: inline-block;
   margin-left: 18px;
@@ -598,6 +618,36 @@ h1 {
   .signature-input-row {
     grid-template-columns: 1fr;
   }
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --ink: #17211b;
+  --muted: #68756c;
+  --paper: #f3f5ef;
+  --cream: #fbfcf8;
+  --line: #d7ded5;
+  --green: #2f7653;
+  --green-dark: #1d4e36;
+  --lime: #d7f071;
+  --orange: #e78350;
+  --glass: rgba(251, 252, 248, 0.72);
+  --glass-shadow: rgba(23, 33, 27, 0.08);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #edf2eb;
+  --muted: #aeb9af;
+  --paper: #17201a;
+  --cream: #202a22;
+  --line: #39463c;
+  --green: #88c69f;
+  --green-dark: #d7eddb;
+  --lime: #bfd66b;
+  --orange: #f0a274;
+  --glass: rgba(32, 42, 34, 0.72);
+  --glass-shadow: rgba(0, 0, 0, 0.22);
 }
 
 .simulation-section {
