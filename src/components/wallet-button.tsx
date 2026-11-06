@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import {
   useConnectedWallet,
   useConnect,
@@ -9,6 +9,22 @@ import {
   WalletReadyGate,
 } from "@solana/kit-plugin-wallet/react";
 import { client } from "@/app/providers";
+
+const hydrationEvent = "proofline-wallet-hydrated";
+let hasHydrated = false;
+
+function subscribeToHydration(callback: () => void) {
+  window.addEventListener(hydrationEvent, callback);
+  return () => window.removeEventListener(hydrationEvent, callback);
+}
+
+function getHydrationSnapshot() {
+  return hasHydrated;
+}
+
+function getServerHydrationSnapshot() {
+  return false;
+}
 
 function WalletButtonContent() {
   const wallets = useWallets(client);
@@ -58,10 +74,15 @@ function WalletButtonContent() {
 
 export function WalletButton() {
   const isHydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+    subscribeToHydration,
+    getHydrationSnapshot,
+    getServerHydrationSnapshot,
   );
+
+  useEffect(() => {
+    hasHydrated = true;
+    window.dispatchEvent(new Event(hydrationEvent));
+  }, []);
 
   if (!isHydrated) {
     return <span className="wallet-hint">Looking for wallets...</span>;
