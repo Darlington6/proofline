@@ -9,6 +9,12 @@ const MODEL_TIMEOUT_MS = 15_000;
 const MAX_FINDINGS = 8;
 const MAX_TEXT = 600;
 
+function findings(flagged: TransactionAnalysis["risks"]) {
+  return flagged.length > 0
+    ? flagged.map((r) => `${r.label}: ${r.detail}`)
+    : ["The rules engine found nothing to flag."];
+}
+
 export function rulesExplanation(analysis: TransactionAnalysis): Explanation {
   const flagged = analysis.risks.filter((r) => r.severity !== "clear");
   const high = flagged.find((r) => r.severity === "high");
@@ -19,6 +25,30 @@ export function rulesExplanation(analysis: TransactionAnalysis): Explanation {
   const failed = analysis.risks.some(
     (r) => r.key === "failed-simulation" && r.severity === "high",
   );
+
+  // A confirmed transaction already happened, so the advice is about
+  // what to do next, not whether to sign.
+  if (analysis.status !== "simulated") {
+    return {
+      provider: "rules",
+      summary: failed
+        ? "This transaction failed on-chain, so only the fee was charged."
+        : high
+          ? `High risk. ${high.detail}`
+          : review
+            ? `Worth a closer look. ${review.detail}`
+            : main
+              ? `This looked routine. ${main.detail}`
+              : "This looked routine.",
+      recommendation:
+        analysis.riskLevel === "high"
+          ? "If you did not expect this, act now: revoke the approval or move your funds to a wallet you control."
+          : analysis.riskLevel === "medium"
+            ? "Check that the destinations and amounts are what you intended."
+            : "Nothing here needs action.",
+      findings: findings(flagged),
+    };
+  }
 
   return {
     provider: "rules",
@@ -37,10 +67,7 @@ export function rulesExplanation(analysis: TransactionAnalysis): Explanation {
         : analysis.riskLevel === "medium"
           ? "Check each highlighted item, especially destinations and amounts, before signing."
           : "You can continue to wallet approval. Your wallet will still ask you to confirm.",
-    findings:
-      flagged.length > 0
-        ? flagged.map((r) => `${r.label}: ${r.detail}`)
-        : ["The rules engine found nothing to flag."],
+    findings: findings(flagged),
   };
 }
 

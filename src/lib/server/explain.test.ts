@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { TransactionAnalysis } from "@/lib/analysis/types";
-import { explain, parseModelResponse } from "./explain";
+import { explain, parseModelResponse, rulesExplanation } from "./explain";
 
 function analysis(
   riskLevel: TransactionAnalysis["riskLevel"],
@@ -64,6 +64,15 @@ describe("parseModelResponse", () => {
 
   it("rejects an answer without a risk level", () => {
     expect(() => parseModelResponse(JSON.stringify(modelAnswer))).toThrow();
+  });
+});
+
+describe("rulesExplanation", () => {
+  it("speaks about a confirmed transaction in the past tense", () => {
+    const confirmed = { ...analysis("low"), status: "confirmed" as const };
+    const result = rulesExplanation(confirmed);
+    expect(result.summary).toMatch(/^This looked routine/);
+    expect(result.recommendation).not.toMatch(/sign/i);
   });
 });
 
