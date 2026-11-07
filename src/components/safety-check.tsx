@@ -396,6 +396,12 @@ export function SafetyCheck() {
                         : "View receipt ↗"}
                     </a>
                   </>
+                ) : signature ? (
+                  <p>
+                    This transaction is already signed, so a receipt saved now
+                    could not prove the check came first. Save the receipt
+                    before signing next time.
+                  </p>
                 ) : (
                   <>
                     <p>

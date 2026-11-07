@@ -110,7 +110,9 @@ function Result({ result }: { result: Awaited<ReturnType<typeof load>> }) {
       {
         ok: transaction.recordedFirst,
         label: "Checked first",
-        detail: `Receipt in slot ${receipt.slot.toLocaleString()}, transaction in slot ${transaction.slot.toLocaleString()}.`,
+        detail: transaction.recordedFirst
+          ? `Receipt in slot ${receipt.slot.toLocaleString()}, transaction in slot ${transaction.slot.toLocaleString()}.`
+          : `The receipt (slot ${receipt.slot.toLocaleString()}) was saved after the transaction (slot ${transaction.slot.toLocaleString()}), so it cannot prove the check came first.`,
       },
       {
         ok: transaction.succeeded,
@@ -177,13 +179,11 @@ export default async function ReceiptsPage(props: PageProps<"/receipts">) {
 
   return (
     <main>
-      <nav className="nav shell" aria-label="Primary navigation">
+      <nav className="nav nav-simple shell" aria-label="Primary navigation">
         <Link className="wordmark" href="/" aria-label="Proofline home">
           proof<span>line</span>
         </Link>
-        <div className="nav-meta">
-          <Link href="/#simulation">Run a safety check</Link>
-        </div>
+        <Link href="/#simulation">Run a safety check →</Link>
       </nav>
 
       <section
@@ -198,9 +198,9 @@ export default async function ReceiptsPage(props: PageProps<"/receipts">) {
           <form className="signature-form glass-panel" method="get">
             <label htmlFor="receipt">Receipt signature</label>
             <p>
-              A receipt is a memo your wallet signs after a check. It records
-              the risk level and a fingerprint of the exact transaction
-              Proofline simulated.
+              A receipt is a memo your wallet signs after a check and before
+              signing. It records the risk level and a fingerprint of the exact
+              transaction Proofline simulated.
             </p>
             <div className="receipt-inputs">
               <input
