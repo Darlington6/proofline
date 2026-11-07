@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import {
-  analyzeTransaction,
-  type TransactionAnalysis,
-} from "@/lib/transaction-analysis";
+import { explain } from "@/lib/server/explain";
+import { inspectConfirmedTransaction } from "@/lib/server/inspect";
+import { errorResponse } from "@/lib/server/responses";
 
-const signaturePattern = /^[1-9A-HJ-NP-Za-km-z]{32,88}$/;
+const signaturePattern = /^[1-9A-HJ-NP-Za-km-z]{64,88}$/;
 
 export async function GET(
   _request: Request,
@@ -19,56 +18,19 @@ export async function GET(
     );
   }
 
-  const rpcUrl =
-    process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-  const rpcResponse = await fetch(rpcUrl, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: "proofline",
-      method: "getTransaction",
-      params: [
-        signature,
+  try {
+    const analysis = await inspectConfirmedTransaction(signature);
+    if (!analysis) {
+      return NextResponse.json(
         {
-          commitment: "confirmed",
-          encoding: "jsonParsed",
-          maxSupportedTransactionVersion: 1,
+          error: "Transaction not found on Devnet. It may still be confirming.",
         },
-      ],
-    }),
-    cache: "no-store",
-  });
-
-  if (!rpcResponse.ok) {
-    return NextResponse.json(
-      { error: "The Solana RPC request failed." },
-      { status: 502 },
-    );
+        { status: 404 },
+      );
+    }
+    const { explanation, riskLevel } = await explain(analysis);
+    return NextResponse.json({ analysis, explanation, riskLevel });
+  } catch (error) {
+    return errorResponse(error);
   }
-
-  const payload = (await rpcResponse.json()) as {
-    error?: { message?: string };
-    result?: Parameters<typeof analyzeTransaction>[1] | null;
-  };
-
-  if (payload.error) {
-    return NextResponse.json(
-      { error: payload.error.message ?? "The Solana RPC request failed." },
-      { status: 502 },
-    );
-  }
-
-  if (!payload.result) {
-    return NextResponse.json(
-      { error: "Transaction not found on Devnet." },
-      { status: 404 },
-    );
-  }
-
-  const analysis: TransactionAnalysis = analyzeTransaction(
-    signature,
-    payload.result,
-  );
-  return NextResponse.json(analysis);
 }
