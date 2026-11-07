@@ -424,7 +424,7 @@ export async function inspectUnsignedTransaction(
 
   return {
     analysis,
-    messageHash: createHash("sha256").update(messageBytes).digest("hex"),
+    messageHash: hashMessage(messageBytes),
     signableByWallet:
       walletParam !== undefined &&
       parts.signers.length === 1 &&
@@ -439,11 +439,16 @@ type UiTokenBalance = {
   uiTokenAmount: { amount: string; decimals: number };
 };
 
-export async function inspectConfirmedTransaction(
-  signature: string,
-): Promise<TransactionAnalysis | null> {
+/** SHA-256 of a transaction message: the fingerprint receipts commit to. */
+export function hashMessage(messageBytes: Uint8Array) {
+  return createHash("sha256").update(messageBytes).digest("hex");
+}
+
+/** Fetch a confirmed transaction and decode its message. */
+export async function fetchConfirmed(signature: string) {
   const result = await rpcCall<{
     slot: number;
+    blockTime: number | null;
     transaction: [string, "base64"];
     meta: {
       err: unknown;
@@ -470,12 +475,20 @@ export async function inspectConfirmedTransaction(
   const { compiled, messageBytes } = decodeWire(
     new Uint8Array(base64.encode(result.transaction[0])),
   );
-  const meta = result.meta;
   const loaded = {
-    writable: meta?.loadedAddresses?.writable ?? [],
-    readonly: meta?.loadedAddresses?.readonly ?? [],
+    writable: result.meta?.loadedAddresses?.writable ?? [],
+    readonly: result.meta?.loadedAddresses?.readonly ?? [],
   };
-  const parts = buildParts(compiled, messageBytes, loaded);
+  return { result, parts: buildParts(compiled, messageBytes, loaded) };
+}
+
+export async function inspectConfirmedTransaction(
+  signature: string,
+): Promise<TransactionAnalysis | null> {
+  const fetched = await fetchConfirmed(signature);
+  if (!fetched) return null;
+  const { result, parts } = fetched;
+  const meta = result.meta;
   const wallet = parts.keys[0];
 
   const sol = parts.keys

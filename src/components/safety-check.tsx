@@ -16,6 +16,8 @@ import {
   compareWalletVersion,
   type WalletChange,
 } from "@/lib/analysis/compare";
+import { buildReceipt } from "@/lib/client/receipt";
+import { receiptPath } from "@/lib/receipt";
 import {
   SCENARIOS,
   buildScenario,
@@ -91,6 +93,9 @@ export function SafetyCheck() {
   const [acknowledged, setAcknowledged] = useState(false);
   const [signature, setSignature] = useState("");
   const [confirmedReview, setConfirmedReview] = useState<Review | null>(null);
+  const [receipt, setReceipt] = useState("");
+  const [receiptBusy, setReceiptBusy] = useState(false);
+  const [receiptError, setReceiptError] = useState("");
   const [walletChange, setWalletChange] = useState<
     (WalletChange & { messageHash: string; riskLevel: RiskLevel }) | null
   >(null);
@@ -102,7 +107,8 @@ export function SafetyCheck() {
     phase === "checking" ||
     phase === "signing" ||
     phase === "rechecking" ||
-    phase === "confirming";
+    phase === "confirming" ||
+    receiptBusy;
 
   function reset() {
     setResult(null);
@@ -112,6 +118,8 @@ export function SafetyCheck() {
     setSignature("");
     setConfirmedReview(null);
     setWalletChange(null);
+    setReceipt("");
+    setReceiptError("");
     setPhase("idle");
   }
 
@@ -194,6 +202,41 @@ export function SafetyCheck() {
       );
       // Once sent, keep the Explorer link visible even if confirmation stalls.
       setPhase(sent ? "confirmed" : "idle");
+    }
+  }
+
+  async function saveReceipt() {
+    if (!result || !connected?.signer || !walletAddress) return;
+    setReceiptError("");
+    setReceiptBusy(true);
+    try {
+      const transaction = await buildReceipt(
+        address(walletAddress),
+        { riskLevel: result.riskLevel, messageHash: result.messageHash },
+        client.rpc,
+      );
+      const outcome = await signChecked(transaction, connected.signer);
+      let sent: string;
+      if (outcome.kind === "sent") {
+        sent = outcome.signature;
+      } else {
+        if (outcome.changed) {
+          throw new Error(
+            "Your wallet changed the receipt transaction, so it was not sent.",
+          );
+        }
+        sent = await sendSigned(outcome.wire, client.rpc);
+      }
+      await waitForConfirmation(client.rpc, sent);
+      setReceipt(sent);
+    } catch (receiptFailure) {
+      setReceiptError(
+        receiptFailure instanceof Error
+          ? receiptFailure.message
+          : "Unable to save the receipt.",
+      );
+    } finally {
+      setReceiptBusy(false);
     }
   }
 
@@ -336,6 +379,54 @@ export function SafetyCheck() {
                 Checked message fingerprint{" "}
                 <code>{result.messageHash.slice(0, 16)}…</code>
               </p>
+
+              <div className="receipt-box">
+                <strong>Proof receipt</strong>
+                {receipt ? (
+                  <>
+                    <p>
+                      Saved on Devnet. Anyone can verify that this exact
+                      transaction was checked
+                      {signature ? " before it was signed" : ""} and what
+                      Proofline found.
+                    </p>
+                    <a href={receiptPath(receipt, signature || undefined)}>
+                      {signature
+                        ? "Verify the signed transaction against this receipt ↗"
+                        : "View receipt ↗"}
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      Record this check on Solana: your wallet signs a memo with
+                      the fingerprint and the {result.riskLevel} risk result
+                      (about 0.000005 SOL).
+                      {result.signableByWallet && !signature
+                        ? " Save it before signing to prove the check came first."
+                        : ""}
+                    </p>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={saveReceipt}
+                      disabled={!connected?.signer || busy}
+                    >
+                      {receiptBusy ? "Saving receipt..." : "Save proof receipt"}
+                    </button>
+                    {!connected?.signer ? (
+                      <p className="simulation-note">
+                        Connect a Devnet wallet to save a receipt.
+                      </p>
+                    ) : null}
+                  </>
+                )}
+                {receiptError ? (
+                  <p className="form-error" role="alert">
+                    {receiptError}
+                  </p>
+                ) : null}
+              </div>
 
               {walletChange ? (
                 <div className="wallet-change">

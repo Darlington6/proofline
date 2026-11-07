@@ -73,7 +73,7 @@ const PRIORITY_MICRO_LAMPORTS = 1_000n; // per unit; under 0.000001 SOL total
  * transaction has none, which changes the bytes Proofline checked. Setting
  * the compute budget up front avoids most of those edits.
  */
-function computeBudget(units: number): Instruction[] {
+export function computeBudget(units: number): Instruction[] {
   const limit = new Uint8Array(5);
   limit[0] = 2; // SetComputeUnitLimit
   new DataView(limit.buffer).setUint32(1, units, true);
@@ -163,16 +163,12 @@ async function instructionsFor(
   ];
 }
 
-/** Build an unsigned, base64-encoded Devnet transaction for a scenario. */
-export async function buildScenario(
-  kind: ScenarioKind,
+/** Compile instructions into an unsigned v0 transaction paid by `wallet`. */
+export async function compileForWallet(
+  instructions: Instruction[],
   wallet: Address,
-  rpc: ScenarioRpc,
+  rpc: Rpc<GetLatestBlockhashApi>,
 ) {
-  const instructions = [
-    ...computeBudget(COMPUTE_LIMIT[kind]),
-    ...(await instructionsFor(kind, wallet, rpc)),
-  ];
   const { value: blockhash } = await rpc
     .getLatestBlockhash({ commitment: "confirmed" })
     .send();
@@ -185,4 +181,17 @@ export async function buildScenario(
   );
 
   return getBase64EncodedWireTransaction(compileTransaction(message));
+}
+
+/** Build an unsigned, base64-encoded Devnet transaction for a scenario. */
+export async function buildScenario(
+  kind: ScenarioKind,
+  wallet: Address,
+  rpc: ScenarioRpc,
+) {
+  const instructions = [
+    ...computeBudget(COMPUTE_LIMIT[kind]),
+    ...(await instructionsFor(kind, wallet, rpc)),
+  ];
+  return compileForWallet(instructions, wallet, rpc);
 }

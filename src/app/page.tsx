@@ -39,6 +39,7 @@ export default function Home() {
             <a href="#workflow">Workflow</a>
             <a href="#simulation">Safety Check</a>
             <a href="#review">Review Signature</a>
+            <Link href="/receipts">Verify Receipt</Link>
           </div>
           <a
             className="nav-wallet-link"
@@ -159,6 +160,7 @@ export default function Home() {
                 <a href="#workflow">Workflow</a>
                 <a href="#simulation">Safety check</a>
                 <a href="#review">Review signature</a>
+                <Link href="/receipts">Verify a receipt</Link>
               </div>
               <div>
                 <span className="footer-label">Resources</span>

@@ -9,6 +9,7 @@ import {
   isTokenProgram,
   shortAddress,
 } from "./programs";
+import { parseReceiptMemo } from "@/lib/receipt";
 import type { DecodedInstruction, Effect, RawInstruction } from "./types";
 
 export const U64_MAX = 0xffff_ffff_ffff_ffffn;
@@ -337,6 +338,15 @@ function decodeComputeBudget(ix: RawInstruction): Partial {
 
 function decodeMemo(ix: RawInstruction): Partial {
   const text = new TextDecoder().decode(ix.data);
+  const receipt = parseReceiptMemo(text);
+  if (receipt) {
+    return {
+      action: "Proofline receipt",
+      detail: `Records that Proofline checked message ${receipt.messageHash.slice(0, 12)}… and found ${receipt.riskLevel} risk.`,
+      level: "safe",
+      effects: [],
+    };
+  }
   const shown = text.length > 80 ? `${text.slice(0, 77)}...` : text;
   return {
     action: "Memo",

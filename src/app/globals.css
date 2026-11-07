@@ -545,6 +545,7 @@ h1 {
 .section-heading .eyebrow {
   margin: 0;
 }
+.section-heading h1,
 .section-heading h2 {
   margin: 0;
   color: var(--green-dark);
@@ -1181,6 +1182,40 @@ html[data-theme="dark"] {
 }
 .fingerprint code {
   color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.receipt-inputs {
+  display: grid;
+  gap: 8px;
+}
+.receipt-inputs input {
+  min-width: 0;
+  padding: 14px;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.75rem;
+}
+.receipt-inputs input:focus {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+.receipt-inputs label {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+}
+.receipt-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 14px 0 0;
+}
+.receipt-links a {
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 .approval-box {
   display: grid;
@@ -1199,6 +1234,28 @@ html[data-theme="dark"] {
   margin-top: 2px;
   accent-color: var(--green-dark);
 }
+.receipt-box {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--lime);
+  border-radius: 2px;
+  font-size: 0.85rem;
+}
+.receipt-box p {
+  margin: 0;
+  color: var(--muted);
+}
+.receipt-box a {
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.receipt-box .secondary-button {
+  margin: 4px 0 0;
+}
 .wallet-change {
   display: grid;
   gap: 6px;
@@ -1206,7 +1263,7 @@ html[data-theme="dark"] {
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-left: 3px solid var(--orange);
-  border-radius: 10px;
+  border-radius: 2px;
   font-size: 0.9rem;
 }
 .wallet-change p {
