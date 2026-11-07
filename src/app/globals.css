@@ -151,6 +151,19 @@ a {
 .mobile-menu-panel a:focus-visible {
   background: color-mix(in srgb, var(--lime) 36%, transparent);
 }
+.mobile-wallet-action {
+  padding: 4px;
+}
+.mobile-wallet-action .wallet-options,
+.mobile-wallet-action .wallet-status,
+.mobile-wallet-action .wallet-unavailable {
+  width: 100%;
+}
+.mobile-wallet-action .wallet-options .primary-button,
+.mobile-wallet-action .wallet-button {
+  width: 100%;
+  justify-content: center;
+}
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -194,6 +207,7 @@ a {
 }
 
 .hero {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
   align-items: center;
@@ -228,13 +242,13 @@ h1 {
   line-height: 1.7;
 }
 .hero-actions {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  position: absolute;
+  top: 28px;
+  right: 0;
+  display: flex;
   align-items: center;
-  gap: 20px;
-  width: 100%;
-  padding-top: 4px;
+  justify-content: flex-end;
+  gap: 22px;
 }
 .hero-actions > .wallet-options,
 .hero-actions > .wallet-status {
@@ -288,10 +302,19 @@ h1 {
   flex-wrap: wrap;
   gap: 10px;
 }
+.wallet-options .primary-button,
 .wallet-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 12px;
+}
+.wallet-unavailable {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
 }
 .wallet-address,
 .wallet-hint {
@@ -566,7 +589,10 @@ h1 {
     display: none;
   }
   .hero-actions {
+    position: static;
+    display: grid;
     grid-template-columns: 1fr;
+    width: 100%;
     gap: 15px;
   }
   .hero-actions > .text-link {

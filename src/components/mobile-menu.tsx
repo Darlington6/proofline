@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { WalletButton } from "@/components/wallet-button";
 
 const links = [
   { href: "#workflow", label: "Workflow" },
@@ -50,6 +51,9 @@ export function MobileMenu() {
               {link.label}
             </a>
           ))}
+          <div className="mobile-wallet-action">
+            <WalletButton />
+          </div>
           <ThemeToggle />
         </div>
       ) : null}

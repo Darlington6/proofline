@@ -109,6 +109,18 @@ To enable model-backed explanations:
 
 The key is read only by the server-side `/api/explain` route. Check the provider's pricing and usage limits before enabling it. An API key is not required for the hackathon demo because the rules-based path remains available.
 
+If the UI still says **Rules-based explanation** after adding the key, stop and restart `npm run dev`. Next.js reads `.env` when the server starts. An invalid key, unavailable model, provider error, or malformed model response also intentionally falls back to the rules engine.
+
+## Automated Tests
+
+Run the focused risk-model tests with:
+
+```bash
+npm test
+```
+
+The current tests cover a safe self-transfer, funds leaving the wallet, token approvals, unknown programs, and large fees. Run `npm run validate` before pushing; it includes formatting, type checking, linting, tests, and the production build.
+
 ## Approval Needed Before Implementation
 
 - Product concept and primary user

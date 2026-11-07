@@ -7,11 +7,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate": "npm run format:check && npm run typecheck && npm run lint && npm run build"
+    "validate": "npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@solana-program/system": "^0.16.0",
@@ -19,6 +20,7 @@
     "@solana/kit-plugin-rpc": "^0.23.0",
     "@solana/kit-plugin-wallet": "^0.23.0",
     "@solana/react": "^8.6.0",
+    "lucide-react": "^1.70.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest"
@@ -30,6 +32,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "prettier": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^5.1.0"
   }
 }

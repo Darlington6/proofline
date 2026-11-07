@@ -65,6 +65,15 @@ export default function Home() {
             decide.
           </p>
         </div>
+        <div className="hero-actions" id="hero-actions">
+          <WalletButton />
+          <a
+            className="text-link"
+            href="https://solana.com/docs/intro/quick-start"
+          >
+            Read the Solana quick start <span aria-hidden="true">→</span>
+          </a>
+        </div>
         <div className="review-panel" aria-label="Example transaction review">
           <div className="panel-topline">
             <span>TRANSACTION REVIEW</span>
@@ -98,15 +107,6 @@ export default function Home() {
           </div>
           <a className="simulate-button" href="#simulation">
             Simulate transaction
-          </a>
-        </div>
-        <div className="hero-actions" id="hero-actions">
-          <WalletButton />
-          <a
-            className="text-link"
-            href="https://solana.com/docs/intro/quick-start"
-          >
-            Read the Solana quick start <span aria-hidden="true">→</span>
           </a>
         </div>
       </section>

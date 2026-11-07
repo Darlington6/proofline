@@ -131,7 +131,8 @@ export function TransactionReview() {
                 ))}
               </ul>
               <p className="simulation-note">
-                Simulation before signing is the next safety check.
+                Historical lookup only. This view does not replay or simulate a
+                completed transaction.
               </p>
             </>
           ) : null}
