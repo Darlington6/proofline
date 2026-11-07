@@ -11,7 +11,7 @@ const rpcUrl =
 
 export const client = createClient()
   .use(walletSigner({ chain: "solana:devnet" }))
-  .use(solanaRpc({ rpcUrl, transactionConfig: { version: 1 } }));
+  .use(solanaRpc({ rpcUrl }));
 
 export type AppClient = Awaited<typeof client>;
 

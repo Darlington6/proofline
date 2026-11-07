@@ -320,33 +320,63 @@ h1 {
   cursor: not-allowed;
   opacity: 0.55;
 }
-.risk-lab {
+.scenario-group {
   display: grid;
-  gap: 7px;
-  margin: 4px 0 14px;
-  padding: 12px;
-  border: 1px dashed var(--line);
+  gap: 8px;
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
 }
-.risk-lab > span {
-  color: var(--orange);
-  font-family: "DM Mono", monospace;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.scenario-group p {
+  margin: 0 0 6px;
 }
-.risk-lab button {
-  cursor: pointer;
-  padding: 8px 10px;
+.field-label,
+.signature-form form label {
+  display: block;
   color: var(--green-dark);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.signature-form form label {
+  margin-bottom: 10px;
+}
+.scenario-button {
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  padding: 12px;
+  color: var(--ink);
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 2px;
-  font-size: 0.72rem;
   text-align: left;
 }
-.risk-lab button:hover,
-.risk-lab button:focus-visible {
+.scenario-button:hover:not(:disabled),
+.scenario-button:focus-visible {
   border-color: var(--green-dark);
+}
+.scenario-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.scenario-button .risk-badge {
+  text-align: center;
+}
+.scenario-text {
+  display: grid;
+  gap: 3px;
+}
+.scenario-text strong {
+  color: var(--green-dark);
+  font-size: 0.8rem;
+}
+.scenario-text small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
 }
 .primary-button span {
   display: inline-block;
@@ -1065,4 +1095,112 @@ html[data-theme="dark"] {
   .simulation-layout {
     grid-template-columns: 1fr;
   }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.shield-mark-high {
+  color: var(--cream);
+  background: #c85a4c;
+}
+.analysis-report .explanation-panel {
+  margin-top: 18px;
+  padding-top: 0;
+  border-top: 0;
+}
+.report-section {
+  margin-top: 20px;
+}
+.report-section .panel-kicker {
+  margin: 0;
+}
+.change-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.change-list li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+.change-list em {
+  color: #c85a4c;
+  font-style: normal;
+}
+.change-list strong {
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.delta-out {
+  color: #c85a4c;
+}
+.delta-in {
+  color: var(--green);
+}
+.instruction-list li.instruction-review {
+  border-left-color: var(--orange);
+}
+.instruction-list li.instruction-high {
+  border-left-color: #c85a4c;
+}
+.instruction-list li.instruction-inner {
+  margin-left: 16px;
+}
+.instruction-list small {
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.log-details {
+  margin-top: 14px;
+}
+.log-details summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+.fingerprint {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+}
+.fingerprint code {
+  color: var(--ink);
+}
+.approval-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.acknowledge {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: var(--ink);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+.acknowledge input {
+  margin-top: 2px;
+  accent-color: var(--green-dark);
+}
+.confirmed-review {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 2px solid var(--lime);
 }

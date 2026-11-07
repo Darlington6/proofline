@@ -2,7 +2,7 @@ import Link from "next/link";
 import { WalletButton } from "@/components/wallet-button";
 import { TransactionReview } from "@/components/transaction-review";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SimulationPanel } from "@/components/simulation-panel";
+import { SafetyCheck } from "@/components/safety-check";
 import { MobileMenu } from "@/components/mobile-menu";
 import { CurrentYear } from "@/components/current-year";
 import { Wallet as WalletIcon } from "lucide-react";
@@ -75,39 +75,39 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <div className="review-panel" aria-label="Example transaction review">
+        <div className="review-panel" aria-label="Example Proofline readout">
           <div className="panel-topline">
-            <span>TRANSACTION REVIEW</span>
+            <span>EXAMPLE READOUT</span>
             <span className="status-pill">DEVNET</span>
           </div>
           <div className="review-heading">
-            <span className="shield-mark" aria-hidden="true">
-              ✓
+            <span className="shield-mark shield-mark-high" aria-hidden="true">
+              !
             </span>
             <div>
-              <p className="panel-kicker">Plain-language readout</p>
-              <h2>Swap 0.25 SOL for USDC</h2>
+              <p className="panel-kicker">Token approval · high risk</p>
+              <h2>A stranger could spend all of these tokens</h2>
             </div>
           </div>
           <div className="review-grid">
             <div>
-              <span>Estimated fee</span>
-              <strong>~0.000005 SOL</strong>
+              <span>Delegate allowance</span>
+              <strong>Unlimited</strong>
             </div>
             <div>
               <span>Program activity</span>
-              <strong>Jupiter · Token</strong>
+              <strong>System · Token · ATA</strong>
             </div>
           </div>
           <div className="risk-note">
             <span aria-hidden="true">i</span>
             <p>
-              No unexpected wallet drain detected. Simulation required before
-              signing.
+              Found by simulating on Devnet and reading the token account
+              afterwards. Signing stays blocked.
             </p>
           </div>
           <a className="simulate-button" href="#simulation">
-            Simulate transaction
+            Run this scenario yourself
           </a>
         </div>
       </section>
@@ -133,7 +133,7 @@ export default function Home() {
       </section>
 
       <div id="simulation">
-        <SimulationPanel />
+        <SafetyCheck />
       </div>
 
       <div id="review">

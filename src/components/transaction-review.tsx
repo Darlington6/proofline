@@ -1,40 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import type { TransactionAnalysis } from "@/lib/transaction-analysis";
+import { AnalysisReport } from "@/components/analysis-report";
+import type {
+  Explanation,
+  RiskLevel,
+  TransactionAnalysis,
+} from "@/lib/analysis/types";
+
+type Review = {
+  analysis: TransactionAnalysis;
+  explanation: Explanation;
+  riskLevel: RiskLevel;
+};
 
 export function TransactionReview() {
   const [signature, setSignature] = useState("");
-  const [analysis, setAnalysis] = useState<TransactionAnalysis | null>(null);
+  const [review, setReview] = useState<Review | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const trimmedSignature = signature.trim();
-    if (!trimmedSignature) return;
+    const trimmed = signature.trim();
+    if (!trimmed) return;
 
     setIsLoading(true);
     setError("");
-    setAnalysis(null);
+    setReview(null);
 
     try {
       const response = await fetch(
-        `/api/transactions/${encodeURIComponent(trimmedSignature)}`,
+        `/api/transactions/${encodeURIComponent(trimmed)}`,
       );
-      const payload = (await response.json()) as
-        TransactionAnalysis | { error?: string };
-
-      if (!response.ok) {
-        const message = "error" in payload ? payload.error : undefined;
-        throw new Error(message ?? "Unable to load transaction.");
+      const payload = (await response.json().catch(() => null)) as
+        (Review & { error?: string }) | null;
+      if (!response.ok || !payload?.analysis) {
+        throw new Error(payload?.error ?? "Unable to load transaction.");
       }
-
-      if (!("signature" in payload)) {
-        throw new Error(payload.error ?? "Unable to load transaction.");
-      }
-
-      setAnalysis(payload);
+      setReview(payload);
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -52,8 +56,8 @@ export function TransactionReview() {
       aria-labelledby="review-title"
     >
       <div className="section-heading">
-        <p className="eyebrow">Start with a signature</p>
-        <h2 id="review-title">Bring a transaction into focus.</h2>
+        <p className="eyebrow">After the fact</p>
+        <h2 id="review-title">Review any Devnet transaction.</h2>
       </div>
       <div className="review-form-layout">
         <form className="signature-form glass-panel" onSubmit={handleSubmit}>
@@ -61,7 +65,8 @@ export function TransactionReview() {
             Devnet transaction signature
           </label>
           <p>
-            Paste a confirmed signature to inspect its instructions and fee.
+            Paste a confirmed signature. Proofline decodes every instruction,
+            including calls made inside other programs, and shows what changed.
           </p>
           <div className="signature-input-row">
             <input
@@ -88,54 +93,26 @@ export function TransactionReview() {
         </form>
 
         <div className="analysis-panel glass-panel" aria-live="polite">
-          {!analysis && !error ? (
+          {review ? (
+            <AnalysisReport
+              analysis={review.analysis}
+              explanation={review.explanation}
+              riskLevel={review.riskLevel}
+              kicker="Confirmed transaction"
+              title={
+                review.analysis.status === "failed"
+                  ? "Failed transaction"
+                  : "Confirmed transaction"
+              }
+            />
+          ) : (
             <div className="empty-analysis">
               <span className="analysis-mark" aria-hidden="true">
                 +
               </span>
-              <p>Analysis will appear here after a Devnet lookup.</p>
+              <p>The analysis appears here after a Devnet lookup.</p>
             </div>
-          ) : null}
-          {analysis ? (
-            <>
-              <div className="analysis-header">
-                <div>
-                  <p className="panel-kicker">Parsed result</p>
-                  <h3>
-                    {analysis.status === "confirmed"
-                      ? "Confirmed transaction"
-                      : "Failed transaction"}
-                  </h3>
-                </div>
-                <span className={`risk-badge risk-${analysis.riskLevel}`}>
-                  {analysis.riskLevel} risk
-                </span>
-              </div>
-              <p className="analysis-summary">{analysis.riskSummary}</p>
-              <div className="analysis-stats">
-                <span>
-                  Slot <strong>{analysis.slot}</strong>
-                </span>
-                <span>
-                  Fee <strong>{analysis.feeSol.toFixed(6)} SOL</strong>
-                </span>
-              </div>
-              <ul className="instruction-list">
-                {analysis.instructions.map((instruction, index) => (
-                  <li key={`${instruction.program}-${index}`}>
-                    <span>{instruction.action}</span>
-                    <small>
-                      {instruction.program} · {instruction.detail}
-                    </small>
-                  </li>
-                ))}
-              </ul>
-              <p className="simulation-note">
-                Historical lookup only. This view does not replay or simulate a
-                completed transaction.
-              </p>
-            </>
-          ) : null}
+          )}
         </div>
       </div>
     </section>
