@@ -85,15 +85,16 @@ export async function POST(request: Request) {
   }
 
   const fallback = rulesExplanation(body.analysis, body.simulation);
-  const apiKey = process.env.AI_API_KEY ?? process.env.OPENAI_API_KEY;
+  // `||` (not `??`) so an empty AI_API_KEY= line does not hide OPENAI_API_KEY.
+  const apiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({ ...fallback, fallbackReason: "missing-key" });
   }
 
   const model =
-    process.env.AI_MODEL ?? process.env.OPENAI_MODEL ?? "gpt-4o-mini";
-  const baseUrl = process.env.AI_BASE_URL ?? "https://api.openai.com/v1";
+    process.env.AI_MODEL || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const baseUrl = process.env.AI_BASE_URL || "https://api.openai.com/v1";
   const response = await fetch(
     `${baseUrl.replace(/\/$/, "")}/chat/completions`,
     {
