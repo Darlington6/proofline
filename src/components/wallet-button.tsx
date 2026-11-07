@@ -56,7 +56,15 @@ function WalletButtonContent() {
     return (
       <span className="wallet-hint wallet-unavailable">
         <Wallet size={16} aria-hidden="true" />
-        Install a Wallet Standard wallet
+        <span>Install a Wallet Standard wallet</span>
+        <a
+          className="wallet-install-link"
+          href="https://solana.com/wallets"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Get a wallet ↗
+        </a>
       </span>
     );
   }

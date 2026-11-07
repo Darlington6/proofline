@@ -9,6 +9,7 @@ type SimulationSummary = {
 
 type Explanation = {
   provider: "rules" | "openai";
+  fallbackReason?: "missing-key" | "provider-error" | "invalid-response";
   summary: string;
   recommendation: string;
   findings: string[];
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return NextResponse.json(fallback);
+    return NextResponse.json({ ...fallback, fallbackReason: "missing-key" });
   }
 
   const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
@@ -119,7 +120,12 @@ export async function POST(request: Request) {
   });
 
   if (!response.ok) {
-    return NextResponse.json({ ...fallback, provider: "rules" });
+    console.warn(`Explanation provider returned HTTP ${response.status}`);
+    return NextResponse.json({
+      ...fallback,
+      provider: "rules",
+      fallbackReason: "provider-error",
+    });
   }
 
   const payload = (await response.json()) as {
@@ -128,7 +134,10 @@ export async function POST(request: Request) {
   const content = payload.choices?.[0]?.message?.content;
 
   if (!content) {
-    return NextResponse.json(fallback);
+    return NextResponse.json({
+      ...fallback,
+      fallbackReason: "invalid-response",
+    });
   }
 
   try {
@@ -137,6 +146,9 @@ export async function POST(request: Request) {
       ...parseModelResponse(content),
     });
   } catch {
-    return NextResponse.json(fallback);
+    return NextResponse.json({
+      ...fallback,
+      fallbackReason: "invalid-response",
+    });
   }
 }

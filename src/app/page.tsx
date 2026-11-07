@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { SimulationPanel } from "@/components/simulation-panel";
 import { MobileMenu } from "@/components/mobile-menu";
 import { CurrentYear } from "@/components/current-year";
+import { Wallet as WalletIcon } from "lucide-react";
 
 const workflow = [
   {
@@ -45,7 +46,7 @@ export default function Home() {
             aria-label="Go to wallet connection"
             title="Connect wallet"
           >
-            <span aria-hidden="true">◈</span>
+            <WalletIcon size={18} aria-hidden="true" />
             <span>Wallet</span>
           </a>
           <div className="desktop-theme-toggle">
@@ -64,15 +65,15 @@ export default function Home() {
             Read the instructions, see the risk, simulate the outcome, then
             decide.
           </p>
-        </div>
-        <div className="hero-actions" id="hero-actions">
-          <WalletButton />
-          <a
-            className="text-link"
-            href="https://solana.com/docs/intro/quick-start"
-          >
-            Read the Solana quick start <span aria-hidden="true">→</span>
-          </a>
+          <div className="hero-actions" id="hero-actions">
+            <WalletButton />
+            <a
+              className="text-link"
+              href="https://solana.com/docs/intro/quick-start"
+            >
+              Read the Solana quick start <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
         <div className="review-panel" aria-label="Example transaction review">
           <div className="panel-topline">

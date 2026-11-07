@@ -47,6 +47,7 @@ type SimulationResult = {
 
 type Explanation = {
   provider: "rules" | "openai";
+  fallbackReason?: "missing-key" | "provider-error" | "invalid-response";
   summary: string;
   recommendation: string;
   findings: string[];
@@ -360,6 +361,16 @@ export function SimulationPanel() {
                   ? "AI explanation"
                   : "Rules-based explanation"}
               </p>
+              {explanation.fallbackReason ? (
+                <p className="explanation-source">
+                  {explanation.fallbackReason === "missing-key"
+                    ? "No model key was detected."
+                    : explanation.fallbackReason === "provider-error"
+                      ? "The model provider request failed."
+                      : "The model response was invalid."}{" "}
+                  Showing the deterministic fallback.
+                </p>
+              ) : null}
               <h3>{explanation.summary}</h3>
               <p className="analysis-summary">{explanation.recommendation}</p>
               <ul className="finding-list">

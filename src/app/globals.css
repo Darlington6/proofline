@@ -140,6 +140,10 @@ a {
   box-shadow: 0 18px 45px var(--glass-shadow);
   backdrop-filter: blur(18px);
 }
+.mobile-wallet-action svg {
+  width: 24px;
+  height: 24px;
+}
 .mobile-menu-panel a {
   padding: 11px 12px;
   color: var(--green-dark);
@@ -242,19 +246,28 @@ h1 {
   line-height: 1.7;
 }
 .hero-actions {
-  position: absolute;
-  top: 28px;
-  right: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   gap: 22px;
+  margin-top: 8px;
+}
+.wallet-install-link {
+  color: var(--green-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wallet-install-link:hover,
+.wallet-install-link:focus-visible {
+  color: var(--orange);
 }
 .hero-actions > .wallet-options,
 .hero-actions > .wallet-status {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   min-width: 0;
 }
 .hero-actions > .text-link {
@@ -578,6 +591,9 @@ h1 {
   .mobile-menu {
     display: block;
   }
+  .mobile-menu-panel {
+    width: 75vw;
+  }
   .desktop-theme-toggle {
     display: none;
   }
@@ -589,7 +605,6 @@ h1 {
     display: none;
   }
   .hero-actions {
-    position: static;
     display: grid;
     grid-template-columns: 1fr;
     width: 100%;
@@ -960,6 +975,13 @@ html[data-theme="dark"] {
   color: var(--green-dark);
   font-size: 1rem;
   line-height: 1.4;
+}
+.explanation-source {
+  margin: 8px 0 0;
+  color: var(--orange);
+  font-family: "DM Mono", monospace;
+  font-size: 0.63rem;
+  line-height: 1.45;
 }
 .finding-list li {
   padding-left: 12px;
