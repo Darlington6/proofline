@@ -37,8 +37,8 @@ export default function Home() {
         <div className="nav-meta">
           <div className="desktop-nav-links">
             <a href="#workflow">Workflow</a>
-            <a href="#simulation">Safety check</a>
-            <a href="#review">Review</a>
+            <a href="#simulation">Safety Check</a>
+            <a href="#review">Review Signature</a>
           </div>
           <a
             className="nav-wallet-link"

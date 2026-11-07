@@ -60,10 +60,10 @@ export function ThemeToggle() {
   const nextTheme = getNextTheme(theme);
   const label =
     theme === "system"
-      ? "System theme"
+      ? "System Theme"
       : theme === "light"
-        ? "Light theme"
-        : "Dark theme";
+        ? "Light Theme"
+        : "Dark Theme";
 
   return (
     <button

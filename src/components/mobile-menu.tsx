@@ -6,8 +6,8 @@ import { WalletButton } from "@/components/wallet-button";
 
 const links = [
   { href: "#workflow", label: "Workflow" },
-  { href: "#simulation", label: "Safety check" },
-  { href: "#review", label: "Review signature" },
+  { href: "#simulation", label: "Safety Check" },
+  { href: "#review", label: "Review Signature" },
 ];
 
 export function MobileMenu() {
