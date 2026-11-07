@@ -8,7 +8,7 @@ type SimulationSummary = {
 };
 
 type Explanation = {
-  provider: "rules" | "openai";
+  provider: "rules" | "model";
   fallbackReason?: "missing-key" | "provider-error" | "invalid-response";
   summary: string;
   recommendation: string;
@@ -85,39 +85,44 @@ export async function POST(request: Request) {
   }
 
   const fallback = rulesExplanation(body.analysis, body.simulation);
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.AI_API_KEY ?? process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({ ...fallback, fallbackReason: "missing-key" });
   }
 
-  const model = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json",
+  const model =
+    process.env.AI_MODEL ?? process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+  const baseUrl = process.env.AI_BASE_URL ?? "https://api.openai.com/v1";
+  const response = await fetch(
+    `${baseUrl.replace(/\/$/, "")}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are Proofline, a cautious Solana transaction safety reviewer. Explain only the provided facts. Never claim a transaction is safe with certainty. Return JSON with string fields summary and recommendation, plus a string array findings.",
+          },
+          {
+            role: "user",
+            content: JSON.stringify({
+              analysis: body.analysis,
+              simulation: body.simulation,
+            }),
+          },
+        ],
+      }),
     },
-    body: JSON.stringify({
-      model,
-      temperature: 0.1,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are Proofline, a cautious Solana transaction safety reviewer. Explain only the provided facts. Never claim a transaction is safe with certainty. Return JSON with string fields summary and recommendation, plus a string array findings.",
-        },
-        {
-          role: "user",
-          content: JSON.stringify({
-            analysis: body.analysis,
-            simulation: body.simulation,
-          }),
-        },
-      ],
-    }),
-  });
+  );
 
   if (!response.ok) {
     console.warn(`Explanation provider returned HTTP ${response.status}`);
@@ -142,7 +147,7 @@ export async function POST(request: Request) {
 
   try {
     return NextResponse.json({
-      provider: "openai",
+      provider: "model",
       ...parseModelResponse(content),
     });
   } catch {

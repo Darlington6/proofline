@@ -109,6 +109,16 @@ To enable model-backed explanations:
 
 The key is read only by the server-side `/api/explain` route. Check the provider's pricing and usage limits before enabling it. An API key is not required for the hackathon demo because the rules-based path remains available.
 
+OpenAI-compatible providers can use the alternate variables:
+
+```env
+AI_API_KEY=your_provider_key
+AI_BASE_URL=https://your-provider.example/v1
+AI_MODEL=your-provider-model
+```
+
+A Muse Code or coding-assistant key will work only if that product provides an API endpoint compatible with OpenAI Chat Completions. A key intended only for the Muse Code editor cannot be used by Proofline; in that case, keep the rules-based explanation or use an API key from a model provider.
+
 If the UI still says **Rules-based explanation** after adding the key, stop and restart `npm run dev`. Next.js reads `.env` when the server starts. An invalid key, unavailable model, provider error, or malformed model response also intentionally falls back to the rules engine.
 
 ## Automated Tests

@@ -46,7 +46,7 @@ type SimulationResult = {
 };
 
 type Explanation = {
-  provider: "rules" | "openai";
+  provider: "rules" | "model";
   fallbackReason?: "missing-key" | "provider-error" | "invalid-response";
   summary: string;
   recommendation: string;
@@ -357,7 +357,7 @@ export function SimulationPanel() {
           {explanation ? (
             <div className="explanation-panel">
               <p className="panel-kicker">
-                {explanation.provider === "openai"
+                {explanation.provider === "model"
                   ? "AI explanation"
                   : "Rules-based explanation"}
               </p>

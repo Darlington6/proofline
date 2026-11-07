@@ -78,6 +78,7 @@ a {
   display: contents;
 }
 .desktop-nav-links a {
+  text-transform: none;
   color: var(--green-dark);
   font-size: 0.7rem;
   font-weight: 600;
@@ -96,6 +97,7 @@ a {
   color: var(--green-dark);
   font-size: 0.7rem;
   font-weight: 600;
+  text-transform: none;
   text-decoration: none;
 }
 .nav-wallet-link > span:first-child {
@@ -141,14 +143,17 @@ a {
   backdrop-filter: blur(18px);
 }
 .mobile-wallet-action svg {
-  width: 24px;
-  height: 24px;
+  flex: 0 0 32px;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
 }
 .mobile-menu-panel a {
   padding: 11px 12px;
   color: var(--green-dark);
   font-size: 0.78rem;
   font-weight: 600;
+  text-transform: none;
   text-decoration: none;
 }
 .mobile-menu-panel a:hover,
