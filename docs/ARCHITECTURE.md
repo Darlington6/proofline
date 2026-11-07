@@ -15,7 +15,11 @@ Browser: scenario builder or pasted payload (base64, unsigned)
        6. Rules engine -> risk categories
        7. Optional model explanation (can raise risk, never lower it)
   <- { analysis, explanation, riskLevel, messageHash, signableByWallet }
+Browser: optional proof receipt -> wallet signs a Memo Program note
+         "proofline:v1:<risk>:<messageHash>" -> confirmed on Devnet
 Browser: Approve and sign (exact checked bytes) -> confirm -> review confirmed result
+Anyone:  /receipts?receipt=<sig>&tx=<sig> -> fetch both from Devnet,
+         hash the signed message, compare with the receipt
 ```
 
 ## Frontend
@@ -23,7 +27,8 @@ Browser: Approve and sign (exact checked bytes) -> confirm -> review confirmed r
 - Next.js App Router, React, and TypeScript
 - Solana Kit client with Wallet Standard discovery (no legacy wallet adapter)
 - `src/lib/client/scenarios.ts` builds real Devnet transactions with `@solana-program/system` and `@solana-program/token`
-- `src/lib/client/sign.ts` signs the exact transaction that was checked. When the wallet returns the signed transaction, Proofline compares the message bytes and refuses to send if the wallet changed anything.
+- `src/lib/client/sign.ts` signs the exact transaction that was checked. When the wallet returns the signed transaction, Proofline compares the message bytes. If the wallet changed anything, Proofline re-checks the wallet's version (`src/lib/analysis/compare.ts`) and sends it only if it is no riskier, still simulates, and costs at most 0.001 SOL more.
+- `src/lib/client/receipt.ts` builds the proof receipt transaction.
 - `src/components/analysis-report.tsx` renders the same report for pre-signing checks, confirmed results, and historical lookups
 
 ## Backend
@@ -32,6 +37,7 @@ The backend is the `src/app/api/` directory. Next.js runs these route handlers o
 
 - `POST /api/transactions/check` decodes, simulates, analyses, and explains an unsigned transaction.
 - `GET /api/transactions/[signature]` runs the same decoder and rules on a confirmed transaction, using its recorded balances and inner instructions.
+- `/receipts` is a server-rendered page that verifies a proof receipt (`src/lib/server/receipts.ts`).
 
 Supporting modules:
 
@@ -51,6 +57,19 @@ Supporting modules:
 - High-risk transactions, failed simulations, and transactions that need other signers cannot be signed from Proofline.
 - Devnet is the only supported network for development and judging.
 
-## Deferred Protocol Layer
+## Proof Receipts
 
-The optional proof receipt remains a future Anchor program. It would commit a transaction hash, explanation hash, wallet, timestamp, and final signature on-chain after the core flow is stable. It is intentionally outside the current backend route handlers.
+A receipt is a Memo Program note signed by the wallet:
+
+```text
+proofline:v1:<low|medium|high>:<sha256 of the checked message, hex>
+```
+
+The wallet is listed on the memo instruction, so the Memo Program requires its signature. That ties the receipt to the wallet, and Solana's slot ordering timestamps it. The verification page checks that:
+
+1. The receipt transaction succeeded and contains a valid receipt memo.
+2. The signed transaction's message hashes to the receipt's fingerprint, so nothing changed after the check.
+3. The wallet that saved the receipt also signed the transaction.
+4. The receipt landed in the same or an earlier slot than the transaction.
+
+No custom program or server storage is needed: Solana is the record, and anyone can re-run the check. If a wallet edits a transaction while signing, its fingerprint no longer matches the receipt, and the page says so.

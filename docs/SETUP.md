@@ -96,6 +96,8 @@ Connect Phantom (set to Devnet), then use the scenario buttons in **Run the safe
 | Send 0.01 SOL to a new address   | Medium        | Funds leaving the wallet are flagged. Signing needs an explicit acknowledgement.                             |
 | Approve unlimited token spending | High          | A token approval is caught from the instruction and from the simulated account state. Signing stays blocked. |
 
+To test proof receipts, run a scenario and select **Save proof receipt** before **Approve and sign**. Approve the memo in Phantom. After signing the main transaction, follow **Verify the signed transaction against this receipt**. All four checks should pass. The verification page also works without a wallet at `/receipts`.
+
 You can also paste any base64-encoded unsigned transaction. If your connected wallet is not its only signer, Proofline reviews it but does not offer to sign.
 
 Without a connected wallet, scenarios need a funded Devnet address to act as the fee payer in simulation. Set `NEXT_PUBLIC_DEMO_WALLET` to the public address of a Devnet wallet you control and fund it from the faucet. Only the public address is used; simulation does not check signatures, so no key is involved.

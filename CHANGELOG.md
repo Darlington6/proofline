@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Exact-bytes signing with a wallet-modification check, confirmation tracking, and a post-signing review.
 - When a wallet edits a transaction while signing, Proofline re-checks the wallet's version and sends it only if it is no riskier, still simulates, and costs at most 0.001 SOL more.
 - AI explanations that receive decoded instructions and balance changes, report confidence, and can only raise the rules engine's risk.
+- Proof receipts: after a check, the wallet can sign a Memo Program note with the risk level and the checked message's SHA-256. A public `/receipts` page verifies on Devnet that a signed transaction matches its receipt, came from the same wallet, and was recorded first.
 - Vercel deployment guide.
 
 ### Changed
