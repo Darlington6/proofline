@@ -131,6 +131,8 @@ npm test
 
 The current tests cover a safe self-transfer, funds leaving the wallet, token approvals, unknown programs, and large fees. Run `npm run validate` before pushing; it includes formatting, type checking, linting, tests, and the production build.
 
+In development, the **Risk Lab** appears in the safety-check form. Use **Medium: Unknown program** to verify a medium-risk explanation, or **High: Token approval** to verify a high-risk explanation and confirm that **Approve and sign** stays disabled. These fixtures are local UI scenarios; they do not call the network or move assets.
+
 ## Approval Needed Before Implementation
 
 - Product concept and primary user

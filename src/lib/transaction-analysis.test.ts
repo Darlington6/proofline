@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   analyzeTransaction,
   createPreparedTransferAnalysis,
+  createRiskFixtureAnalysis,
 } from "./transaction-analysis";
 
 function transactionWith(instruction: Record<string, unknown>, fee = 5_000) {
@@ -92,5 +93,21 @@ describe("transaction analysis", () => {
     expect(
       analysis.risks.find((risk) => risk.key === "large-fee")?.severity,
     ).toBe("review");
+  });
+
+  it("creates a medium-risk unknown-program fixture", () => {
+    const analysis = createRiskFixtureAnalysis("medium-unknown-program");
+
+    expect(analysis.riskLevel).toBe("medium");
+    expect(analysis.instructions[0]?.program).toBe("Unknown Program");
+  });
+
+  it("creates a high-risk token-approval fixture", () => {
+    const analysis = createRiskFixtureAnalysis("high-token-approval");
+
+    expect(analysis.riskLevel).toBe("high");
+    expect(
+      analysis.risks.find((risk) => risk.key === "token-approval")?.severity,
+    ).toBe("high");
   });
 });

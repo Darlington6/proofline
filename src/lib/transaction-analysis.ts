@@ -272,3 +272,65 @@ export function createPreparedTransferAnalysis(
     ],
   };
 }
+
+export type RiskFixture = "medium-unknown-program" | "high-token-approval";
+
+export function createRiskFixtureAnalysis(
+  fixture: RiskFixture,
+): TransactionAnalysis {
+  const base = createPreparedTransferAnalysis(
+    "fixture-wallet1111111111111111111111111111",
+  );
+
+  if (fixture === "medium-unknown-program") {
+    return {
+      ...base,
+      signature: "fixture-medium-unknown-program",
+      riskLevel: "medium",
+      riskSummary:
+        "This fixture contains an unrecognized program instruction and needs review before signing.",
+      instructions: [
+        {
+          program: "Unknown Program",
+          action: "Program instruction",
+          detail: "A program-specific instruction requires review.",
+          level: "review",
+        },
+      ],
+      risks: base.risks.map((risk) =>
+        risk.key === "unknown-program"
+          ? {
+              ...risk,
+              severity: "review",
+              detail: "An unrecognized program is included in this fixture.",
+            }
+          : risk,
+      ),
+    };
+  }
+
+  return {
+    ...base,
+    signature: "fixture-high-token-approval",
+    riskLevel: "high",
+    riskSummary:
+      "This fixture grants token authority to another account and should be rejected until the allowance is understood.",
+    instructions: [
+      {
+        program: "Token Program",
+        action: "Token approval or authority change",
+        detail: "A delegate may control token movement.",
+        level: "review",
+      },
+    ],
+    risks: base.risks.map((risk) =>
+      risk.key === "token-approval"
+        ? {
+            ...risk,
+            severity: "high",
+            detail: "This fixture grants another account token authority.",
+          }
+        : risk,
+    ),
+  };
+}

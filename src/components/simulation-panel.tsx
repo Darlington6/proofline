@@ -20,6 +20,8 @@ import { useConnectedWallet } from "@solana/kit-plugin-wallet/react";
 import { client } from "@/app/providers";
 import {
   createPreparedTransferAnalysis,
+  createRiskFixtureAnalysis,
+  type RiskFixture,
   type TransactionAnalysis,
 } from "@/lib/transaction-analysis";
 
@@ -172,6 +174,22 @@ export function SimulationPanel() {
     }
   }
 
+  async function loadRiskFixture(fixture: RiskFixture) {
+    const analysis = createRiskFixtureAnalysis(fixture);
+    const simulation = {
+      err: null,
+      logs: ["Fixture simulation: no network request made."],
+      unitsConsumed: 150,
+    };
+
+    setTransaction("");
+    setPreparedAnalysis(analysis);
+    setResult(simulation);
+    setError("");
+    setExplanation(null);
+    await explainResult(analysis, simulation);
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
@@ -234,6 +252,9 @@ export function SimulationPanel() {
   }
 
   const sentSignature = sentData?.context.signature;
+  const resultRisk = result?.err
+    ? "high"
+    : (preparedAnalysis?.riskLevel ?? "low");
 
   return (
     <section
@@ -275,6 +296,23 @@ export function SimulationPanel() {
                   ? "Prepare 0.001 SOL self-transfer"
                   : "Connect wallet to prepare a transfer"}
           </button>
+          {process.env.NODE_ENV !== "production" ? (
+            <div className="risk-lab">
+              <span>Risk Lab</span>
+              <button
+                type="button"
+                onClick={() => loadRiskFixture("medium-unknown-program")}
+              >
+                Medium: Unknown program
+              </button>
+              <button
+                type="button"
+                onClick={() => loadRiskFixture("high-token-approval")}
+              >
+                High: Token approval
+              </button>
+            </div>
+          ) : null}
           <button
             className="primary-button"
             type="submit"
@@ -312,10 +350,8 @@ export function SimulationPanel() {
                       : "Simulation passed"}
                   </h3>
                 </div>
-                <span
-                  className={`risk-badge ${result.err ? "risk-high" : "risk-low"}`}
-                >
-                  {result.err ? "review" : "clear"}
+                <span className={`risk-badge risk-${resultRisk}`}>
+                  {resultRisk} risk
                 </span>
               </div>
               <div className="analysis-stats">
@@ -388,7 +424,8 @@ export function SimulationPanel() {
                       !connected ||
                       !canSendV1 ||
                       isSending ||
-                      Boolean(result?.err)
+                      Boolean(result?.err) ||
+                      preparedAnalysis?.riskLevel === "high"
                     }
                   >
                     {isSending ? "Waiting for wallet..." : "Approve and sign"}

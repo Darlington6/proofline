@@ -320,6 +320,34 @@ h1 {
   cursor: not-allowed;
   opacity: 0.55;
 }
+.risk-lab {
+  display: grid;
+  gap: 7px;
+  margin: 4px 0 14px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+}
+.risk-lab > span {
+  color: var(--orange);
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.risk-lab button {
+  cursor: pointer;
+  padding: 8px 10px;
+  color: var(--green-dark);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 0.72rem;
+  text-align: left;
+}
+.risk-lab button:hover,
+.risk-lab button:focus-visible {
+  border-color: var(--green-dark);
+}
 .primary-button span {
   display: inline-block;
   margin-left: 18px;
