@@ -86,11 +86,19 @@ solana balance YOUR_PUBLIC_ADDRESS
 
 Devnet SOL has no mainnet value and is only for development.
 
-## Testing Simulation
+## Testing the Safety Check
 
-The simulation panel accepts an unsigned, base64-encoded transaction payload. It calls Solana's `simulateTransaction` RPC method with signature verification disabled and does not sign or submit the transaction. After connecting Phantom, use **Prepare 0.001 SOL self-transfer** to create a simulation-ready payload without signing it.
+Connect Phantom (set to Devnet), then use the scenario buttons in **Run the safety check**. Each one builds a real transaction in the browser, sends it to `/api/transactions/check`, and shows the report. Nothing is signed unless you select **Approve and sign**.
 
-Historical transaction signatures cannot be simulated retroactively. The prepared self-transfer is addressed from and back to the connected Devnet wallet so it is safe to inspect without moving funds.
+| Scenario                         | Expected risk | What it proves                                                                                               |
+| -------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
+| Send 0.001 SOL to yourself       | Low           | A routine transfer passes and can be signed.                                                                 |
+| Send 0.01 SOL to a new address   | Medium        | Funds leaving the wallet are flagged. Signing needs an explicit acknowledgement.                             |
+| Approve unlimited token spending | High          | A token approval is caught from the instruction and from the simulated account state. Signing stays blocked. |
+
+You can also paste any base64-encoded unsigned transaction. If your connected wallet is not its only signer, Proofline reviews it but does not offer to sign.
+
+Without a connected wallet, scenarios need a funded Devnet address to act as the fee payer in simulation. Set `NEXT_PUBLIC_DEMO_WALLET` to the public address of a Devnet wallet you control and fund it from the faucet. Only the public address is used; simulation does not check signatures, so no key is involved.
 
 ## Optional AI Explanations
 
@@ -123,20 +131,10 @@ If the UI still says **Rules-based explanation** after adding the key, stop and 
 
 ## Automated Tests
 
-Run the focused risk-model tests with:
+Run the test suite with:
 
 ```bash
 npm test
 ```
 
-The current tests cover a safe self-transfer, funds leaving the wallet, token approvals, unknown programs, and large fees. Run `npm run validate` before pushing; it includes formatting, type checking, linting, tests, and the production build.
-
-In development, the **Risk Lab** appears in the safety-check form. Use **Medium: Unknown program** to verify a medium-risk explanation, or **High: Token approval** to verify a high-risk explanation and confirm that **Approve and sign** stays disabled. These fixtures are local UI scenarios; they do not call the network or move assets.
-
-## Approval Needed Before Implementation
-
-- Product concept and primary user
-- Target prize track
-- Frontend stack and Solana framework
-- Whether we need a custom on-chain program or can compose existing programs
-- GitHub repository name and collaborators
+The tests build instructions with the official Kit program clients and cover the decoder, risk rules (including Token-2022 approvals, approvals hidden inside other programs, and delegates that only appear in simulated account state), fee estimation, the AI fallback and risk floor, and the server inspection pipeline with a mocked RPC. Run `npm run validate` before pushing; it includes formatting, type checking, linting, tests, and the production build.

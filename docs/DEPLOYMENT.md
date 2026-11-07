@@ -61,13 +61,15 @@ Use a Phantom (or other Wallet Standard) wallet set to **Devnet** with test SOL 
 
 - [ ] The page loads over HTTPS with no console errors.
 - [ ] **Connect wallet** finds the wallet and shows the shortened address.
-- [ ] **Prepare 0.001 SOL self-transfer** fills the payload box.
-- [ ] **Simulate on Devnet** shows "Simulation passed" with logs and compute units.
+- [ ] **Send 0.001 SOL to yourself** shows "Simulation passed" and **low risk**.
 - [ ] The explanation panel appears (labelled rules-based without a key).
-- [ ] **Approve and sign** opens the wallet, and after approval the Explorer link opens the transaction on Devnet.
-- [ ] Pasting that signature into **Review signature** loads the parsed result.
+- [ ] **Approve and sign** opens the wallet. After approval, the Explorer link works and "What actually happened" appears.
+- [ ] **Send 0.01 SOL to a new address** shows **medium risk** and needs the acknowledgement box before signing.
+- [ ] Pasting a confirmed signature into **Review signature** loads the report.
 
-Known limitation: the **Risk Lab** buttons only appear in development builds, so they are hidden on Vercel.
+Run all three scenarios on the live site. The token approval scenario should show **high risk** with **Approve and sign** disabled.
+
+Optional: set `NEXT_PUBLIC_DEMO_WALLET` to the public address of a funded Devnet wallet so visitors without a wallet can still run the scenarios in review-only mode.
 
 ## 6. After the first deploy
 
