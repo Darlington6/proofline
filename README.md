@@ -2,6 +2,8 @@
 
 A Solana-native project for the November 6-8, 2026 hackathon.
 
+**Live demo (Devnet):** [proofline-topaz.vercel.app](https://proofline-topaz.vercel.app)
+
 ## Current Direction
 
 **Product:** Proofline
@@ -26,6 +28,8 @@ This repository contains the initial project brief, local setup documentation, a
 Read [docs/SETUP.md](docs/SETUP.md) before installing tooling. Then review [docs/PROJECT-BRIEF.md](docs/PROJECT-BRIEF.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the frontend, server route handlers, RPC flow, and trust boundaries.
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) to deploy Proofline to Vercel.
 
 ## Hackathon Constraints
 
