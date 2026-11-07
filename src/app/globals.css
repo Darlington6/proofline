@@ -136,6 +136,9 @@ a {
   right: 0;
   display: grid;
   min-width: 170px;
+  max-width: 75vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
   padding: 8px;
   background: var(--glass);
   border: 1px solid var(--line);
@@ -161,6 +164,9 @@ a {
   background: color-mix(in srgb, var(--lime) 36%, transparent);
 }
 .mobile-wallet-action {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
   padding: 4px;
 }
 .mobile-wallet-action .wallet-options,
@@ -184,7 +190,7 @@ a {
   border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 0.65rem;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.06em;
 }
 .theme-toggle:hover,
@@ -205,8 +211,12 @@ a {
   justify-content: center;
 }
 .mobile-menu-panel .theme-toggle {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   justify-content: flex-start;
-  margin: 4px;
+  margin: 4px 0;
+  white-space: normal;
 }
 .network-dot {
   width: 7px;
@@ -329,8 +339,12 @@ h1 {
 .wallet-unavailable {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  min-width: 0;
   gap: 8px;
   padding: 10px 12px;
+  text-transform: none;
   border: 1px solid var(--line);
   border-radius: 2px;
 }
