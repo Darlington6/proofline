@@ -44,11 +44,22 @@ a {
 
 .nav {
   display: grid;
-  grid-template-columns: 1.4fr repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1.4fr repeat(6, minmax(max-content, 1fr));
   align-items: center;
-  gap: 30px;
+  gap: 24px;
   padding: 28px 0;
   border-bottom: 1px solid var(--line);
+}
+.nav-simple {
+  display: flex;
+  justify-content: space-between;
+}
+.nav-simple a:not(.wordmark) {
+  color: var(--green-dark);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: none;
+  text-decoration: none;
 }
 .wordmark {
   color: var(--green-dark);
@@ -84,6 +95,7 @@ a {
   font-weight: 600;
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
 }
 .desktop-nav-links a:hover,
 .desktop-nav-links a:focus-visible {
@@ -650,18 +662,11 @@ h1 {
   letter-spacing: 0.06em;
 }
 
-@media (max-width: 760px) {
-  .shell {
-    width: min(100% - 32px, 560px);
-  }
+/* Collapse the nav to the menu before its six items run out of room. */
+@media (max-width: 900px) {
   .nav {
     grid-template-columns: 1fr auto;
     gap: 12px;
-  }
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 60px;
-    padding: 72px 0 100px;
   }
   .desktop-nav-links {
     display: none;
@@ -681,6 +686,17 @@ h1 {
   }
   .nav-wallet-link {
     display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .shell {
+    width: min(100% - 32px, 560px);
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 72px 0 100px;
   }
   .hero-actions {
     display: grid;
@@ -1183,6 +1199,17 @@ html[data-theme="dark"] {
 .fingerprint code {
   color: var(--ink);
   overflow-wrap: anywhere;
+}
+.receipt-lookup {
+  max-width: 720px;
+  margin-top: 28px;
+  min-height: 0;
+}
+.receipt-lookup p {
+  max-width: none;
+}
+.receipt-lookup label {
+  margin: 8px 0 0;
 }
 .receipt-inputs {
   display: grid;

@@ -4,6 +4,7 @@ import { TransactionReview } from "@/components/transaction-review";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SafetyCheck } from "@/components/safety-check";
 import { MobileMenu } from "@/components/mobile-menu";
+import { ReceiptLookup } from "@/components/receipt-lookup";
 import { CurrentYear } from "@/components/current-year";
 import { Wallet as WalletIcon } from "lucide-react";
 
@@ -39,7 +40,7 @@ export default function Home() {
             <a href="#workflow">Workflow</a>
             <a href="#simulation">Safety Check</a>
             <a href="#review">Review Signature</a>
-            <Link href="/receipts">Verify Receipt</Link>
+            <a href="#verify">Verify Receipt</a>
           </div>
           <a
             className="nav-wallet-link"
@@ -141,6 +142,10 @@ export default function Home() {
         <TransactionReview />
       </div>
 
+      <div id="verify">
+        <ReceiptLookup />
+      </div>
+
       <footer className="footer">
         <div className="footer-inner shell">
           <div className="footer-top">
@@ -160,7 +165,7 @@ export default function Home() {
                 <a href="#workflow">Workflow</a>
                 <a href="#simulation">Safety check</a>
                 <a href="#review">Review signature</a>
-                <Link href="/receipts">Verify a receipt</Link>
+                <a href="#verify">Verify a receipt</a>
               </div>
               <div>
                 <span className="footer-label">Resources</span>

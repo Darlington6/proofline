@@ -8,7 +8,7 @@ const links = [
   { href: "#workflow", label: "Workflow" },
   { href: "#simulation", label: "Safety Check" },
   { href: "#review", label: "Review Signature" },
-  { href: "/receipts", label: "Verify Receipt" },
+  { href: "#verify", label: "Verify Receipt" },
 ];
 
 export function MobileMenu() {
