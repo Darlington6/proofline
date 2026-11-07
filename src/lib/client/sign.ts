@@ -7,6 +7,7 @@ import {
   isTransactionSendingSigner,
   signAndSendTransactionWithSigners,
   signTransactionWithSigners,
+  type Base64EncodedWireTransaction,
   type GetSignatureStatusesApi,
   type Rpc,
   type SendTransactionApi,
@@ -34,19 +35,23 @@ function friendly(error: unknown) {
   return message;
 }
 
+export type SignOutcome =
+  /** The wallet returned a signed transaction for Proofline to send. */
+  | { kind: "signed"; wire: Base64EncodedWireTransaction; changed: boolean }
+  /** The wallet can only sign-and-send, so it already sent it. */
+  | { kind: "sent"; signature: string };
+
 /**
- * Sign and send exactly the transaction Proofline checked.
+ * Ask the wallet to sign the transaction Proofline checked.
  *
- * When the wallet can return a signed transaction, Proofline compares its
- * message bytes with the checked bytes and refuses to send if the wallet
- * changed anything. Wallets that can only sign-and-send are used as a
- * fallback, and the confirmed result is reviewed afterwards.
+ * Some wallets (Phantom, for example) add instructions such as a priority fee
+ * while signing. The caller gets the signed bytes plus a `changed` flag, so it
+ * can re-check the wallet's version before sending anything.
  */
-export async function signAndSendExact(
+export async function signChecked(
   transactionBase64: string,
   signer: TransactionSigner,
-  rpc: SigningRpc,
-): Promise<string> {
+): Promise<SignOutcome> {
   const transaction = getTransactionDecoder().decode(
     getBase64Encoder().encode(transactionBase64),
   );
@@ -54,17 +59,11 @@ export async function signAndSendExact(
   try {
     if (isTransactionModifyingSigner(signer)) {
       const signed = await signTransactionWithSigners([signer], transaction);
-      if (!sameBytes(signed.messageBytes, transaction.messageBytes)) {
-        throw new Error(
-          "Your wallet changed the transaction after Proofline checked it, so it was not sent. Run the check again.",
-        );
-      }
-      return await rpc
-        .sendTransaction(getBase64EncodedWireTransaction(signed), {
-          encoding: "base64",
-          preflightCommitment: "confirmed",
-        })
-        .send();
+      return {
+        kind: "signed",
+        wire: getBase64EncodedWireTransaction(signed),
+        changed: !sameBytes(signed.messageBytes, transaction.messageBytes),
+      };
     }
 
     if (isTransactionSendingSigner(signer)) {
@@ -72,13 +71,30 @@ export async function signAndSendExact(
         [signer],
         transaction,
       );
-      return getBase58Decoder().decode(signature);
+      return { kind: "sent", signature: getBase58Decoder().decode(signature) };
     }
   } catch (error) {
     throw new Error(friendly(error));
   }
 
   throw new Error("This wallet cannot sign transactions.");
+}
+
+/** Send a transaction the wallet already signed. */
+export async function sendSigned(
+  wire: Base64EncodedWireTransaction,
+  rpc: SigningRpc,
+) {
+  try {
+    return await rpc
+      .sendTransaction(wire, {
+        encoding: "base64",
+        preflightCommitment: "confirmed",
+      })
+      .send();
+  } catch (error) {
+    throw new Error(friendly(error));
+  }
 }
 
 export async function waitForConfirmation(rpc: SigningRpc, signature: string) {

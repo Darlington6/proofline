@@ -8,6 +8,7 @@ import {
   pipe,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
+  address,
   type Address,
   type GetLatestBlockhashApi,
   type GetMinimumBalanceForRentExemptionApi,
@@ -27,6 +28,7 @@ import {
   getMintSize,
   getMintToInstruction,
 } from "@solana-program/token";
+import { COMPUTE_BUDGET_PROGRAM } from "@/lib/analysis/programs";
 
 export type ScenarioKind = "self-transfer" | "send-out" | "token-approval";
 
@@ -57,6 +59,33 @@ type ScenarioRpc = Rpc<
 >;
 
 const U64_MAX = 0xffff_ffff_ffff_ffffn;
+
+// Compute units each scenario may use (actual use is well below these).
+const COMPUTE_LIMIT: Record<ScenarioKind, number> = {
+  "self-transfer": 10_000,
+  "send-out": 10_000,
+  "token-approval": 100_000,
+};
+const PRIORITY_MICRO_LAMPORTS = 1_000n; // per unit; under 0.000001 SOL total
+
+/**
+ * Wallets such as Phantom add their own priority fee while signing when a
+ * transaction has none, which changes the bytes Proofline checked. Setting
+ * the compute budget up front avoids most of those edits.
+ */
+function computeBudget(units: number): Instruction[] {
+  const limit = new Uint8Array(5);
+  limit[0] = 2; // SetComputeUnitLimit
+  new DataView(limit.buffer).setUint32(1, units, true);
+  const price = new Uint8Array(9);
+  price[0] = 3; // SetComputeUnitPrice
+  new DataView(price.buffer).setBigUint64(1, PRIORITY_MICRO_LAMPORTS, true);
+  const programAddress = address(COMPUTE_BUDGET_PROGRAM);
+  return [
+    { programAddress, data: limit },
+    { programAddress, data: price },
+  ];
+}
 
 async function instructionsFor(
   kind: ScenarioKind,
@@ -140,7 +169,10 @@ export async function buildScenario(
   wallet: Address,
   rpc: ScenarioRpc,
 ) {
-  const instructions = await instructionsFor(kind, wallet, rpc);
+  const instructions = [
+    ...computeBudget(COMPUTE_LIMIT[kind]),
+    ...(await instructionsFor(kind, wallet, rpc)),
+  ];
   const { value: blockhash } = await rpc
     .getLatestBlockhash({ commitment: "confirmed" })
     .send();

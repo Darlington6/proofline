@@ -13,14 +13,28 @@ import type {
   TransactionAnalysis,
 } from "@/lib/analysis/types";
 import {
+  compareWalletVersion,
+  type WalletChange,
+} from "@/lib/analysis/compare";
+import {
   SCENARIOS,
   buildScenario,
   type ScenarioKind,
 } from "@/lib/client/scenarios";
-import { signAndSendExact, waitForConfirmation } from "@/lib/client/sign";
+import {
+  sendSigned,
+  signChecked,
+  waitForConfirmation,
+} from "@/lib/client/sign";
 
 type Phase =
-  "idle" | "building" | "checking" | "signing" | "confirming" | "confirmed";
+  | "idle"
+  | "building"
+  | "checking"
+  | "signing"
+  | "rechecking"
+  | "confirming"
+  | "confirmed";
 
 type Review = {
   analysis: TransactionAnalysis;
@@ -43,6 +57,15 @@ async function readJson<T>(response: Response): Promise<T> {
     );
   }
   return payload;
+}
+
+async function checkOnDevnet(transaction: string, wallet: string | null) {
+  const response = await fetch("/api/transactions/check", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ transaction, wallet: wallet ?? undefined }),
+  });
+  return readJson<CheckResult>(response);
 }
 
 async function fetchConfirmedReview(signature: string): Promise<Review | null> {
@@ -68,6 +91,9 @@ export function SafetyCheck() {
   const [acknowledged, setAcknowledged] = useState(false);
   const [signature, setSignature] = useState("");
   const [confirmedReview, setConfirmedReview] = useState<Review | null>(null);
+  const [walletChange, setWalletChange] = useState<
+    (WalletChange & { messageHash: string; riskLevel: RiskLevel }) | null
+  >(null);
 
   const walletAddress = connected?.account.address ?? null;
   const scenarioWallet = walletAddress ?? DEMO_WALLET;
@@ -75,6 +101,7 @@ export function SafetyCheck() {
     phase === "building" ||
     phase === "checking" ||
     phase === "signing" ||
+    phase === "rechecking" ||
     phase === "confirming";
 
   function reset() {
@@ -84,6 +111,7 @@ export function SafetyCheck() {
     setAcknowledged(false);
     setSignature("");
     setConfirmedReview(null);
+    setWalletChange(null);
     setPhase("idle");
   }
 
@@ -91,15 +119,7 @@ export function SafetyCheck() {
     setPhase("checking");
     setError("");
     try {
-      const response = await fetch("/api/transactions/check", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          transaction,
-          wallet: walletAddress ?? undefined,
-        }),
-      });
-      const checked = await readJson<CheckResult>(response);
+      const checked = await checkOnDevnet(transaction, walletAddress);
       setResult(checked);
       setCheckedPayload(transaction);
       setPhase("idle");
@@ -138,14 +158,29 @@ export function SafetyCheck() {
   async function approveAndSign() {
     if (!result || !connected?.signer || checkedPayload !== payload) return;
     setError("");
+    setWalletChange(null);
     setPhase("signing");
     let sent: string | null = null;
     try {
-      sent = await signAndSendExact(
-        checkedPayload,
-        connected.signer,
-        client.rpc,
-      );
+      const outcome = await signChecked(checkedPayload, connected.signer);
+      if (outcome.kind === "sent") {
+        sent = outcome.signature;
+      } else {
+        if (outcome.changed) {
+          // The wallet edited the transaction while signing (often to add a
+          // priority fee). Check its version before sending anything.
+          setPhase("rechecking");
+          const signed = await checkOnDevnet(outcome.wire, walletAddress);
+          const change = compareWalletVersion(result, signed);
+          setWalletChange({
+            ...change,
+            messageHash: signed.messageHash,
+            riskLevel: signed.riskLevel,
+          });
+          if (change.blockedReason) throw new Error(change.blockedReason);
+        }
+        sent = await sendSigned(outcome.wire, client.rpc);
+      }
       setSignature(sent);
       setPhase("confirming");
       await waitForConfirmation(client.rpc, sent);
@@ -302,6 +337,37 @@ export function SafetyCheck() {
                 <code>{result.messageHash.slice(0, 16)}…</code>
               </p>
 
+              {walletChange ? (
+                <div className="wallet-change">
+                  <strong>
+                    Your wallet changed this transaction while signing.
+                  </strong>
+                  <p>
+                    Proofline checked the wallet&apos;s version on Devnet:{" "}
+                    <span
+                      className={`risk-badge risk-${walletChange.riskLevel}`}
+                    >
+                      {walletChange.riskLevel}
+                    </span>{" "}
+                    risk
+                    {walletChange.extraCostLamports > 0
+                      ? `, ${(walletChange.extraCostLamports / 1e9).toFixed(6)} SOL extra cost`
+                      : ""}
+                    .
+                  </p>
+                  {walletChange.added.length ? (
+                    <p>Added: {walletChange.added.join(", ")}</p>
+                  ) : null}
+                  {walletChange.removed.length ? (
+                    <p>Removed: {walletChange.removed.join(", ")}</p>
+                  ) : null}
+                  <p className="fingerprint" title={walletChange.messageHash}>
+                    Signed message fingerprint{" "}
+                    <code>{walletChange.messageHash.slice(0, 16)}…</code>
+                  </p>
+                </div>
+              ) : null}
+
               {!signature ? (
                 <div className="approval-box">
                   {result.riskLevel === "medium" &&
@@ -326,7 +392,9 @@ export function SafetyCheck() {
                   >
                     {phase === "signing"
                       ? "Waiting for wallet..."
-                      : "Approve and sign"}
+                      : phase === "rechecking"
+                        ? "Checking your wallet's version..."
+                        : "Approve and sign"}
                   </button>
                   {blockedReason ? (
                     <p className="simulation-note">{blockedReason}</p>

@@ -1199,6 +1199,21 @@ html[data-theme="dark"] {
   margin-top: 2px;
   accent-color: var(--green-dark);
 }
+.wallet-change {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--orange);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+.wallet-change p {
+  margin: 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
 .confirmed-review {
   margin-top: 26px;
   padding-top: 22px;
