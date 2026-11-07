@@ -235,6 +235,7 @@ export function SimulationPanel() {
     if (
       !connected ||
       !preparedAnalysis ||
+      preparedAnalysis.signature !== "unsigned-devnet-transfer" ||
       !result ||
       result.err ||
       !explanation
@@ -255,6 +256,8 @@ export function SimulationPanel() {
   const resultRisk = result?.err
     ? "high"
     : (preparedAnalysis?.riskLevel ?? "low");
+  const canApprovePreparedTransfer =
+    preparedAnalysis?.signature === "unsigned-devnet-transfer";
 
   return (
     <section
@@ -425,11 +428,17 @@ export function SimulationPanel() {
                       !canSendV1 ||
                       isSending ||
                       Boolean(result?.err) ||
-                      preparedAnalysis?.riskLevel === "high"
+                      preparedAnalysis?.riskLevel === "high" ||
+                      !canApprovePreparedTransfer
                     }
                   >
                     {isSending ? "Waiting for wallet..." : "Approve and sign"}
                   </button>
+                  {!canApprovePreparedTransfer ? (
+                    <p className="simulation-note">
+                      Risk Lab fixtures are review-only and cannot sign.
+                    </p>
+                  ) : null}
                   {!canSendV1 && connected ? (
                     <p className="form-error">
                       This wallet does not support the transaction version
