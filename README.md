@@ -8,9 +8,15 @@ Proofline simulates a transaction on Solana Devnet, decodes everything it would 
 
 Built for the MLH Solana Hackathon, November 6–8, 2026. AI track.
 
-![Proofline home page: "Understand before you sign" next to an example high-risk token approval readout](docs/screenshots/home.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png" />
+  <img alt="Proofline home page: Understand before you sign, next to an example high-risk token approval readout" src="docs/screenshots/home.png" />
+</picture>
 
-![A verified proof receipt: same transaction, same wallet, checked first, and succeeded on Devnet](docs/screenshots/receipt-verified.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/receipt-verified-dark.png" />
+  <img alt="A verified proof receipt: same transaction, same wallet, checked first, and succeeded on Devnet" src="docs/screenshots/receipt-verified.png" />
+</picture>
 
 ## The problem
 
