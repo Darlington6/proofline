@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { address, isAddress } from "@solana/kit";
 import { useConnectedWallet } from "@solana/kit-plugin-wallet/react";
 import { client } from "@/app/providers";
@@ -17,6 +17,7 @@ import {
   type WalletChange,
 } from "@/lib/analysis/compare";
 import { buildReceipt } from "@/lib/client/receipt";
+import { refreshBlockhash } from "@/lib/client/refresh";
 import { receiptPath } from "@/lib/receipt";
 import {
   SCENARIOS,
@@ -35,6 +36,7 @@ type Phase =
   | "checking"
   | "signing"
   | "rechecking"
+  | "refreshing"
   | "confirming"
   | "confirmed";
 
@@ -49,6 +51,14 @@ type Review = {
 // public address is needed.
 const demoWallet = process.env.NEXT_PUBLIC_DEMO_WALLET;
 const DEMO_WALLET = demoWallet && isAddress(demoWallet) ? demoWallet : null;
+
+// A blockhash lasts about a minute. Past this age, Proofline gives the
+// transaction a fresh one and checks it again before asking the wallet.
+const FRESH_FOR_MS = 30_000;
+
+const timestamp = () => Date.now();
+
+const RANK: Record<RiskLevel, number> = { low: 0, medium: 1, high: 2 };
 
 async function readJson<T>(response: Response): Promise<T> {
   const payload = (await response.json().catch(() => null)) as
@@ -88,6 +98,9 @@ export function SafetyCheck() {
   const [payload, setPayload] = useState("");
   const [result, setResult] = useState<CheckResult | null>(null);
   const [checkedPayload, setCheckedPayload] = useState("");
+  // When the current check ran, used to decide if it needs a fresh blockhash.
+  const checkedAt = useRef(0);
+  const [refreshNote, setRefreshNote] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
@@ -107,6 +120,7 @@ export function SafetyCheck() {
     phase === "checking" ||
     phase === "signing" ||
     phase === "rechecking" ||
+    phase === "refreshing" ||
     phase === "confirming" ||
     receiptBusy;
 
@@ -120,6 +134,7 @@ export function SafetyCheck() {
     setWalletChange(null);
     setReceipt("");
     setReceiptError("");
+    setRefreshNote("");
     setPhase("idle");
   }
 
@@ -130,6 +145,7 @@ export function SafetyCheck() {
       const checked = await checkOnDevnet(transaction, walletAddress);
       setResult(checked);
       setCheckedPayload(transaction);
+      checkedAt.current = timestamp();
       setPhase("idle");
     } catch (requestError) {
       setError(
@@ -163,14 +179,54 @@ export function SafetyCheck() {
     }
   }
 
+  /**
+   * Return the checked transaction, re-checked with a fresh blockhash if the
+   * check is too old to sign. The user can read for as long as they like; the
+   * clock only matters once they act. The new version must be no riskier.
+   */
+  async function freshCheck(current: CheckResult, force = false) {
+    if (!force && timestamp() - checkedAt.current < FRESH_FOR_MS) {
+      return { checked: current, transaction: checkedPayload };
+    }
+    const transaction = await refreshBlockhash(checkedPayload, client.rpc);
+    if (!transaction) return { checked: current, transaction: checkedPayload };
+
+    const checked = await checkOnDevnet(transaction, walletAddress);
+    setResult(checked);
+    setPayload(transaction);
+    setCheckedPayload(transaction);
+    checkedAt.current = timestamp();
+    setReceipt("");
+    if (
+      checked.analysis.simulation?.err ||
+      RANK[checked.riskLevel] > RANK[current.riskLevel]
+    ) {
+      setAcknowledged(false);
+      throw new Error(
+        "Proofline checked the transaction again with a fresh blockhash and the result changed. Review the new result before signing.",
+      );
+    }
+    setRefreshNote(
+      "Checked again with a fresh blockhash just now. Same result, so you can continue.",
+    );
+    return { checked, transaction };
+  }
+
   async function approveAndSign() {
     if (!result || !connected?.signer || checkedPayload !== payload) return;
     setError("");
     setWalletChange(null);
-    setPhase("signing");
     let sent: string | null = null;
     try {
-      const outcome = await signChecked(checkedPayload, connected.signer);
+      // With a receipt saved, signing must use the exact transaction it
+      // records, so it is never refreshed here.
+      let current = { checked: result, transaction: checkedPayload };
+      if (!receipt) {
+        setPhase("refreshing");
+        current = await freshCheck(result);
+      }
+      setPhase("signing");
+      const outcome = await signChecked(current.transaction, connected.signer);
       if (outcome.kind === "sent") {
         sent = outcome.signature;
       } else {
@@ -179,7 +235,7 @@ export function SafetyCheck() {
           // priority fee). Check its version before sending anything.
           setPhase("rechecking");
           const signed = await checkOnDevnet(outcome.wire, walletAddress);
-          const change = compareWalletVersion(result, signed);
+          const change = compareWalletVersion(current.checked, signed);
           setWalletChange({
             ...change,
             messageHash: signed.messageHash,
@@ -189,17 +245,34 @@ export function SafetyCheck() {
         }
         sent = await sendSigned(outcome.wire, client.rpc);
       }
+      setRefreshNote("");
       setSignature(sent);
       setPhase("confirming");
       await waitForConfirmation(client.rpc, sent);
       setPhase("confirmed");
       setConfirmedReview(await fetchConfirmedReview(sent));
     } catch (signError) {
-      setError(
+      const message =
         signError instanceof Error
           ? signError.message
-          : "Wallet signing failed.",
-      );
+          : "Wallet signing failed.";
+      if (!sent && /expired before it was sent/.test(message)) {
+        // The receipt's transaction expired before signing. Refresh it so the
+        // user can sign again; the old receipt no longer matches.
+        try {
+          await freshCheck(result, true);
+          setError(
+            "The transaction expired before it was sent, so Proofline checked a fresh copy. Save a new receipt if you want one, then sign again.",
+          );
+        } catch (refreshError) {
+          setError(
+            refreshError instanceof Error ? refreshError.message : message,
+          );
+        }
+        setPhase("idle");
+        return;
+      }
+      setError(message);
       // Once sent, keep the Explorer link visible even if confirmation stalls.
       setPhase(sent ? "confirmed" : "idle");
     }
@@ -210,9 +283,10 @@ export function SafetyCheck() {
     setReceiptError("");
     setReceiptBusy(true);
     try {
+      const { checked } = await freshCheck(result);
       const transaction = await buildReceipt(
         address(walletAddress),
-        { riskLevel: result.riskLevel, messageHash: result.messageHash },
+        { riskLevel: checked.riskLevel, messageHash: checked.messageHash },
         client.rpc,
       );
       const outcome = await signChecked(transaction, connected.signer);
@@ -390,7 +464,11 @@ export function SafetyCheck() {
                       {signature ? " before it was signed" : ""} and what
                       Proofline found.
                     </p>
-                    <a href={receiptPath(receipt, signature || undefined)}>
+                    <a
+                      href={receiptPath(receipt, signature || undefined)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {signature
                         ? "Verify the signed transaction against this receipt ↗"
                         : "View receipt ↗"}
@@ -489,12 +567,16 @@ export function SafetyCheck() {
                   >
                     {phase === "signing"
                       ? "Waiting for wallet..."
-                      : phase === "rechecking"
-                        ? "Checking your wallet's version..."
-                        : "Approve and sign"}
+                      : phase === "refreshing"
+                        ? "Checking a fresh copy..."
+                        : phase === "rechecking"
+                          ? "Checking your wallet's version..."
+                          : "Approve and sign"}
                   </button>
                   {blockedReason ? (
                     <p className="simulation-note">{blockedReason}</p>
+                  ) : refreshNote ? (
+                    <p className="simulation-note">{refreshNote}</p>
                   ) : null}
                 </div>
               ) : (

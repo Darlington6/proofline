@@ -24,10 +24,21 @@ function sameBytes(a: ArrayLike<number>, b: ArrayLike<number>) {
   return true;
 }
 
-function friendly(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
+/** The error's message plus its causes, e.g. "Transaction simulation failed: Blockhash not found". */
+function describe(error: unknown) {
+  const parts: string[] = [];
+  let current: unknown = error;
+  while (current && parts.length < 5) {
+    parts.push(current instanceof Error ? current.message : String(current));
+    current = current instanceof Error ? current.cause : undefined;
+  }
+  return parts.join(": ");
+}
+
+export function friendly(error: unknown) {
+  const message = describe(error);
   if (/blockhash not found|block height exceeded|expired/i.test(message)) {
-    return "This transaction expired before it was sent. Run the check again to get a fresh one.";
+    return "This transaction expired before it was sent. Solana transactions stay valid for about a minute, so run the check again to get a fresh one.";
   }
   if (/reject|declin|cancel/i.test(message)) {
     return "You rejected the request in your wallet. Nothing was sent.";
