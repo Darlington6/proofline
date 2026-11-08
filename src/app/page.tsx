@@ -171,11 +171,25 @@ export default function Home() {
               </div>
               <div>
                 <span className="footer-label">Resources</span>
-                <a href="https://solana.com/docs/intro/quick-start">
+                <a
+                  href="https://solana.com/docs/intro/quick-start"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Solana Quick Start
                 </a>
-                <a href="https://faucet.solana.com/">Devnet Faucet</a>
-                <a href="https://github.com/Darlington6/proofline">
+                <a
+                  href="https://faucet.solana.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Devnet Faucet
+                </a>
+                <a
+                  href="https://github.com/Darlington6/proofline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   GitHub repository
                 </a>
               </div>
