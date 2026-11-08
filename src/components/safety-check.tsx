@@ -212,16 +212,26 @@ export function SafetyCheck() {
     return { checked, transaction };
   }
 
-  async function approveAndSign() {
-    if (!result || !connected?.signer || checkedPayload !== payload) return;
+  /**
+   * Sign the checked transaction. `saved` is passed when signing straight
+   * after saving a receipt, so it uses the exact transaction that receipt
+   * records (state updates from the save are not visible here yet).
+   */
+  async function approveAndSign(saved?: {
+    receipt: string;
+    checked: CheckResult;
+    transaction: string;
+  }) {
+    if (!result || !connected?.signer) return;
+    if (!saved && checkedPayload !== payload) return;
     setError("");
     setWalletChange(null);
     let sent: string | null = null;
     try {
       // With a receipt saved, signing must use the exact transaction it
       // records, so it is never refreshed here.
-      let current = { checked: result, transaction: checkedPayload };
-      if (!receipt) {
+      let current = saved ?? { checked: result, transaction: checkedPayload };
+      if (!saved && !receipt) {
         setPhase("refreshing");
         current = await freshCheck(result);
       }
@@ -282,8 +292,14 @@ export function SafetyCheck() {
     if (!result || !connected?.signer || !walletAddress) return;
     setReceiptError("");
     setReceiptBusy(true);
+    let saved: Parameters<typeof approveAndSign>[0];
     try {
-      const { checked } = await freshCheck(result);
+      // Always start from a brand-new blockhash: the receipt and the signature
+      // that follows must both fit inside the transaction's ~1 minute life.
+      const { checked, transaction: checkedTransaction } = await freshCheck(
+        result,
+        true,
+      );
       const transaction = await buildReceipt(
         address(walletAddress),
         { riskLevel: checked.riskLevel, messageHash: checked.messageHash },
@@ -303,6 +319,7 @@ export function SafetyCheck() {
       }
       await waitForConfirmation(client.rpc, sent);
       setReceipt(sent);
+      saved = { receipt: sent, checked, transaction: checkedTransaction };
     } catch (receiptFailure) {
       setReceiptError(
         receiptFailure instanceof Error
@@ -311,6 +328,11 @@ export function SafetyCheck() {
       );
     } finally {
       setReceiptBusy(false);
+    }
+    // Go straight to signing so the transaction does not expire while the
+    // user moves to the next button.
+    if (saved && blockedReason === null && !signature) {
+      await approveAndSign(saved);
     }
   }
 
@@ -496,7 +518,11 @@ export function SafetyCheck() {
                       onClick={saveReceipt}
                       disabled={!connected?.signer || busy}
                     >
-                      {receiptBusy ? "Saving receipt..." : "Save proof receipt"}
+                      {receiptBusy
+                        ? "Saving receipt..."
+                        : blockedReason === null
+                          ? "Save receipt and sign"
+                          : "Save proof receipt"}
                     </button>
                     {!connected?.signer ? (
                       <p className="simulation-note">
@@ -562,7 +588,7 @@ export function SafetyCheck() {
                   <button
                     className="approve-button"
                     type="button"
-                    onClick={approveAndSign}
+                    onClick={() => approveAndSign()}
                     disabled={!canSign}
                   >
                     {phase === "signing"
