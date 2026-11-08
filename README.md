@@ -8,6 +8,10 @@ Proofline simulates a transaction on Solana Devnet, decodes everything it would 
 
 Built for the MLH Solana Hackathon, November 6–8, 2026. AI track.
 
+![Proofline home page: "Understand before you sign" next to an example high-risk token approval readout](docs/screenshots/home.png)
+
+![A verified proof receipt: same transaction, same wallet, checked first, and succeeded on Devnet](docs/screenshots/receipt-verified.png)
+
 ## The problem
 
 Wallet prompts show raw instructions that most people cannot read, so they approve blindly. Many wallet drainers do not steal funds directly. They ask for a token approval that lets a stranger spend your tokens later, and the prompt looks harmless.
