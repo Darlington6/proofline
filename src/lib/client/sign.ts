@@ -3,8 +3,11 @@ import {
   getBase64EncodedWireTransaction,
   getBase64Encoder,
   getTransactionDecoder,
+  isSolanaError,
   isTransactionModifyingSigner,
   isTransactionSendingSigner,
+  SOLANA_ERROR__BLOCK_HEIGHT_EXCEEDED,
+  SOLANA_ERROR__TRANSACTION_ERROR__BLOCKHASH_NOT_FOUND,
   signAndSendTransactionWithSigners,
   signTransactionWithSigners,
   type Base64EncodedWireTransaction,
@@ -24,20 +27,48 @@ function sameBytes(a: ArrayLike<number>, b: ArrayLike<number>) {
   return true;
 }
 
-/** The error's message plus its causes, e.g. "Transaction simulation failed: Blockhash not found". */
-function describe(error: unknown) {
-  const parts: string[] = [];
+/** The error followed by its causes, outermost first. */
+function chain(error: unknown) {
+  const errors: unknown[] = [];
   let current: unknown = error;
-  while (current && parts.length < 5) {
-    parts.push(current instanceof Error ? current.message : String(current));
+  while (current && errors.length < 5) {
+    errors.push(current);
     current = current instanceof Error ? current.cause : undefined;
   }
-  return parts.join(": ");
+  return errors;
+}
+
+/**
+ * Production builds of @solana/kit drop error text and keep only the code
+ * ("Solana error #7050008; Decode this error by running ..."), so keep just
+ * the code in that case.
+ */
+function text(error: unknown) {
+  if (!(error instanceof Error)) return String(error);
+  if (isSolanaError(error) && error.message.startsWith("Solana error #")) {
+    return `Solana error ${error.context.__code}`;
+  }
+  return error.message;
+}
+
+/** True when Solana says the transaction's blockhash is too old. */
+function isExpired(errors: unknown[]) {
+  return errors.some(
+    (error) =>
+      isSolanaError(
+        error,
+        SOLANA_ERROR__TRANSACTION_ERROR__BLOCKHASH_NOT_FOUND,
+      ) || isSolanaError(error, SOLANA_ERROR__BLOCK_HEIGHT_EXCEEDED),
+  );
 }
 
 export function friendly(error: unknown) {
-  const message = describe(error);
-  if (/blockhash not found|block height exceeded|expired/i.test(message)) {
+  const errors = chain(error);
+  const message = errors.map(text).join(": ");
+  if (
+    isExpired(errors) ||
+    /blockhash not found|block height exceeded|expired/i.test(message)
+  ) {
     return "This transaction expired before it was sent. Solana transactions stay valid for about a minute, so run the check again to get a fresh one.";
   }
   if (/reject|declin|cancel/i.test(message)) {
