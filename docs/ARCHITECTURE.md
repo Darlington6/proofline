@@ -55,6 +55,7 @@ Supporting modules:
 - The server computes the analysis from the transaction bytes; it never trusts an analysis sent by the browser.
 - The rules engine sets the minimum risk. The AI explanation can raise it but never lower it, and it never replaces simulation or wallet review.
 - High-risk transactions, failed simulations, and transactions that need other signers cannot be signed from Proofline.
+- Per-client rate limits protect the RPC quota and the AI budget. When the AI budget runs out, the rules engine answers instead, so safety checks never stop.
 - Devnet is the only supported network for development and judging.
 
 ## Proof Receipts

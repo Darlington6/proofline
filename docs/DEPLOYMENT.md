@@ -31,13 +31,22 @@ On the same screen, open **Environment Variables** and add these values:
 
 `NEXT_PUBLIC_*` values are built into the browser bundle when the app is built. If you change them later, redeploy for the change to take effect.
 
-### AI key: leave it out for the first deploy
+### AI key (optional)
 
 Without a key, Proofline uses its rules engine and labels results **Rules-based explanation**. The app works fully in this mode.
 
-Do not add a model key yet. `/api/explain` has no rate limit, so anyone who finds the public URL can spend your provider credit. Add the key after the route has rate limiting, and set a monthly spend cap in your provider's dashboard first.
+With a key, spending is bounded by built-in rate limits (`src/lib/server/rate-limit.ts`):
 
-When you are ready, add these values under **Settings → Environment Variables** and redeploy:
+| Limit                                         | Value         |
+| --------------------------------------------- | ------------- |
+| Transaction checks per client                 | 20 per minute |
+| Transaction and receipt lookups per client    | 30 per minute |
+| AI explanations per client                    | 8 per minute  |
+| AI explanations across all clients (instance) | 60 per minute |
+
+Over a request limit, the API returns HTTP 429 with `Retry-After`. Over the AI limit, the check still runs and the rules engine answers, labelled as such. The limits live in each server instance's memory, so they stop bursts rather than enforcing an exact global total. Also set a monthly spend cap in your provider's dashboard.
+
+Add these values under **Settings → Environment Variables** and redeploy:
 
 | Name             | Value                                    |
 | ---------------- | ---------------------------------------- |

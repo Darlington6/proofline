@@ -16,6 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - AI explanations that receive decoded instructions and balance changes, report confidence, and can only raise the rules engine's risk.
 - Proof receipts: after a check, the wallet can sign a Memo Program note with the risk level and the checked message's SHA-256. A public `/receipts` page verifies on Devnet that a signed transaction matches its receipt, came from the same wallet, and was recorded first.
 - Home-page receipt lookup that opens the shareable verification page.
+- Per-client rate limits on checks, lookups, and AI explanations. Over the AI limit, the rules engine answers instead.
 - Vercel deployment guide.
 
 ### Changed
