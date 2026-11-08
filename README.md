@@ -119,7 +119,7 @@ Open [localhost:3000](http://localhost:3000). The app works without an AI key. F
 npm run validate   # format, typecheck, lint, tests, production build
 ```
 
-50 tests cover the decoder, the rules engine, simulation inspection (with a mocked RPC), AI fallbacks and the never-lower rule, wallet-modified transactions, receipt verification, signing errors, blockhash refresh, and rate limits. CI runs the same command on every push.
+51 tests cover the decoder, the rules engine, simulation inspection (with a mocked RPC), AI fallbacks and the never-lower rule, wallet-modified transactions, receipt verification, signing errors, blockhash refresh, and rate limits. CI runs the same command on every push.
 
 Server routes have per-client rate limits, RPC and model calls have timeouts, and the server computes every analysis itself instead of trusting the browser.
 

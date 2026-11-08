@@ -36,6 +36,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Fixed
 
 - An expired transaction now says it expired and asks for a fresh check, instead of showing "Transaction simulation failed".
+- Expired transactions are also recognised on the live site, where Solana errors carry only a code (for example "Solana error #7050008"), so the friendly message and automatic fresh check work in production too.
 - Entering a receipt's own signature as the signed transaction gives a clear message instead of a failed verification.
 - The "Run this scenario yourself" button text is readable in dark mode.
 
