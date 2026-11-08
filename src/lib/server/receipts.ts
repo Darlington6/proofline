@@ -113,6 +113,11 @@ export async function verifyReceipt(
 ): Promise<ReceiptVerification> {
   checkSignature(receiptSignature, "receipt");
   if (transactionSignature) checkSignature(transactionSignature, "transaction");
+  if (transactionSignature === receiptSignature) {
+    throw new InputError(
+      "That is the receipt's own signature. Paste the signature of the transaction you signed after saving the receipt, or leave it empty.",
+    );
+  }
 
   const receipt = await readReceipt(receiptSignature);
   if ("status" in receipt) return receipt;

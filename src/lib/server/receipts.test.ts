@@ -155,5 +155,8 @@ describe("verifyReceipt", () => {
     mockTransactions({});
     expect((await verifyReceipt(RECEIPT_SIG)).status).toBe("not-found");
     await expect(verifyReceipt("nope")).rejects.toBeInstanceOf(InputError);
+    await expect(
+      verifyReceipt(RECEIPT_SIG, RECEIPT_SIG),
+    ).rejects.toBeInstanceOf(InputError);
   });
 });
