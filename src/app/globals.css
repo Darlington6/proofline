@@ -11,8 +11,14 @@
   --green-dark: #1d4e36;
   --lime: #d7f071;
   --orange: #e78350;
-  --glass: rgba(251, 252, 248, 0.72);
+  --glass: rgba(255, 255, 255, 0.28);
   --glass-shadow: rgba(23, 33, 27, 0.08);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --glow-a: rgba(215, 240, 113, 0.45);
+  --glow-b: rgba(47, 118, 83, 0.16);
+  --bubble-lime: rgba(215, 240, 113, 0.75);
+  --bubble-green: rgba(47, 118, 83, 0.32);
+  --bubble-orange: rgba(231, 131, 80, 0.35);
 }
 
 * {
@@ -20,13 +26,19 @@
 }
 
 html {
-  background: var(--paper);
+  min-height: 100%;
+  background:
+    radial-gradient(38vw 38vw at 8% 12%, var(--glow-a), transparent 70%),
+    radial-gradient(42vw 42vw at 92% 48%, var(--glow-b), transparent 70%),
+    radial-gradient(30vw 30vw at 30% 95%, var(--glow-b), transparent 70%),
+    var(--paper);
+  background-attachment: fixed;
 }
 
 body {
   margin: 0;
   color: var(--ink);
-  background: var(--paper);
+  background: transparent;
   font-family: "Space Grotesk", sans-serif;
 }
 
@@ -56,7 +68,7 @@ a {
 }
 .nav-simple a:not(.wordmark) {
   color: var(--green-dark);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: none;
   text-decoration: none;
@@ -83,7 +95,7 @@ a {
 .nav-meta {
   display: contents;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .desktop-nav-links {
   display: contents;
@@ -91,7 +103,7 @@ a {
 .desktop-nav-links a {
   text-transform: none;
   color: var(--green-dark);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
   text-decoration: none;
@@ -107,7 +119,7 @@ a {
   justify-content: center;
   gap: 6px;
   color: var(--green-dark);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: none;
   text-decoration: none;
@@ -153,9 +165,12 @@ a {
   overflow-x: hidden;
   padding: 8px;
   background: var(--glass);
-  border: 1px solid var(--line);
-  box-shadow: 0 18px 45px var(--glass-shadow);
-  backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    0 18px 45px var(--glass-shadow);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
 }
 .mobile-wallet-action svg {
   flex: 0 0 32px;
@@ -201,7 +216,7 @@ a {
   background: color-mix(in srgb, var(--glass) 80%, transparent);
   border: 1px solid var(--line);
   border-radius: 999px;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   text-transform: none;
   letter-spacing: 0.06em;
 }
@@ -248,7 +263,7 @@ a {
 .eyebrow {
   margin: 0 0 22px;
   color: var(--orange);
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 500;
 }
 h1,
@@ -282,7 +297,7 @@ h1 {
 }
 .wallet-install-link {
   color: var(--green-dark);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -387,7 +402,7 @@ h1 {
 }
 .scenario-text small {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 .primary-button span {
@@ -422,7 +437,7 @@ h1 {
 .wallet-hint {
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .wallet-button {
   cursor: pointer;
@@ -458,7 +473,7 @@ h1 {
   padding-bottom: 20px;
   color: var(--muted);
   border-bottom: 1px solid var(--line);
-  font-size: 0.62rem;
+  font-size: 0.75rem;
 }
 .status-pill {
   color: var(--green);
@@ -482,7 +497,7 @@ h1 {
 .panel-kicker {
   margin-bottom: 7px;
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: 0.75rem;
 }
 .review-heading h2 {
   margin: 0;
@@ -504,7 +519,7 @@ h1 {
 }
 .review-grid span {
   color: var(--muted);
-  font-size: 0.71rem;
+  font-size: 0.8rem;
 }
 .review-grid strong {
   font-size: 0.84rem;
@@ -537,7 +552,7 @@ h1 {
   display: block;
   width: 100%;
   padding: 14px;
-  color: var(--green-dark);
+  color: #17211b;
   background: var(--lime);
   text-align: center;
   text-decoration: none;
@@ -581,7 +596,7 @@ h1 {
 }
 .step-number {
   color: var(--orange);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
 }
 .workflow-step h3 {
   margin: 30px 0 10px;
@@ -619,7 +634,7 @@ h1 {
   align-items: center;
   gap: 8px;
   font-family: "DM Mono", monospace;
-  font-size: 0.63rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -637,7 +652,7 @@ h1 {
   margin-bottom: 4px;
   color: var(--orange);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -657,7 +672,7 @@ h1 {
   color: var(--muted);
   border-top: 1px solid var(--line);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -751,17 +766,23 @@ h1 {
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --ink: #edf2eb;
-    --muted: #aeb9af;
-    --paper: #17201a;
-    --cream: #202a22;
-    --line: #39463c;
+    --ink: #ededed;
+    --muted: #a3a3a3;
+    --paper: #0a0a0a;
+    --cream: #141414;
+    --line: #2a2a2a;
     --green: #88c69f;
     --green-dark: #d7eddb;
     --lime: #bfd66b;
     --orange: #f0a274;
-    --glass: rgba(32, 42, 34, 0.72);
-    --glass-shadow: rgba(0, 0, 0, 0.22);
+    --glass: rgba(255, 255, 255, 0.04);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    --glass-edge: rgba(255, 255, 255, 0.1);
+    --glow-a: rgba(191, 214, 107, 0.13);
+    --glow-b: rgba(136, 198, 159, 0.11);
+    --bubble-lime: rgba(191, 214, 107, 0.22);
+    --bubble-green: rgba(136, 198, 159, 0.2);
+    --bubble-orange: rgba(240, 162, 116, 0.18);
   }
 }
 
@@ -770,15 +791,19 @@ h1 {
 }
 .review-form-layout {
   display: grid;
+  align-items: start;
   grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1fr);
   gap: 20px;
   padding-top: 28px;
 }
 .glass-panel {
   background: var(--glass);
-  border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
-  box-shadow: 0 18px 45px var(--glass-shadow);
-  backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    0 18px 45px var(--glass-shadow);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  backdrop-filter: blur(24px) saturate(140%);
 }
 .signature-form,
 .analysis-panel {
@@ -872,7 +897,7 @@ h1 {
   border: 1px solid currentColor;
   border-radius: 999px;
   font-family: "DM Mono", monospace;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 .risk-low {
@@ -896,7 +921,7 @@ h1 {
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
 }
 .analysis-stats strong {
@@ -924,13 +949,13 @@ h1 {
 }
 .instruction-list small {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
 }
 .simulation-note {
   margin: 0;
   color: var(--orange);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   line-height: 1.5;
 }
 
@@ -954,23 +979,35 @@ html[data-theme="light"] {
   --green-dark: #1d4e36;
   --lime: #d7f071;
   --orange: #e78350;
-  --glass: rgba(251, 252, 248, 0.72);
+  --glass: rgba(255, 255, 255, 0.28);
   --glass-shadow: rgba(23, 33, 27, 0.08);
+  --glass-edge: rgba(255, 255, 255, 0.7);
+  --glow-a: rgba(215, 240, 113, 0.45);
+  --glow-b: rgba(47, 118, 83, 0.16);
+  --bubble-lime: rgba(215, 240, 113, 0.75);
+  --bubble-green: rgba(47, 118, 83, 0.32);
+  --bubble-orange: rgba(231, 131, 80, 0.35);
 }
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --ink: #edf2eb;
-  --muted: #aeb9af;
-  --paper: #17201a;
-  --cream: #202a22;
-  --line: #39463c;
+  --ink: #ededed;
+  --muted: #a3a3a3;
+  --paper: #0a0a0a;
+  --cream: #141414;
+  --line: #2a2a2a;
   --green: #88c69f;
   --green-dark: #d7eddb;
   --lime: #bfd66b;
   --orange: #f0a274;
-  --glass: rgba(32, 42, 34, 0.72);
-  --glass-shadow: rgba(0, 0, 0, 0.22);
+  --glass: rgba(255, 255, 255, 0.04);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --glow-a: rgba(191, 214, 107, 0.13);
+  --glow-b: rgba(136, 198, 159, 0.11);
+  --bubble-lime: rgba(191, 214, 107, 0.22);
+  --bubble-green: rgba(136, 198, 159, 0.2);
+  --bubble-orange: rgba(240, 162, 116, 0.18);
 }
 
 .simulation-section {
@@ -978,6 +1015,7 @@ html[data-theme="dark"] {
 }
 .simulation-layout {
   display: grid;
+  align-items: start;
   grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1fr);
   gap: 20px;
   padding-top: 28px;
@@ -993,7 +1031,7 @@ html[data-theme="dark"] {
   border: 1px solid var(--line);
   border-radius: 2px;
   font-family: "DM Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
 }
 .signature-form textarea:focus {
   outline: 2px solid var(--lime);
@@ -1009,7 +1047,7 @@ html[data-theme="dark"] {
   background: color-mix(in srgb, var(--paper) 70%, transparent);
   border: 1px solid var(--line);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   line-height: 1.5;
   white-space: pre-wrap;
 }
@@ -1040,7 +1078,7 @@ html[data-theme="dark"] {
 .risk-list small,
 .finding-list li {
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 .risk-dot {
@@ -1074,7 +1112,7 @@ html[data-theme="dark"] {
   margin: 8px 0 0;
   color: var(--orange);
   font-family: "DM Mono", monospace;
-  font-size: 0.63rem;
+  font-size: 0.75rem;
   line-height: 1.45;
 }
 .finding-list li {
@@ -1158,7 +1196,7 @@ html[data-theme="dark"] {
 }
 .change-list strong {
   font-family: "DM Mono", monospace;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 .delta-out {
@@ -1187,14 +1225,14 @@ html[data-theme="dark"] {
   cursor: pointer;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
 }
 .fingerprint {
   margin: 18px 0 0;
   color: var(--muted);
   font-family: "DM Mono", monospace;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
 }
 .fingerprint code {
   color: var(--ink);
@@ -1302,4 +1340,110 @@ html[data-theme="dark"] {
   margin-top: 26px;
   padding-top: 22px;
   border-top: 2px solid var(--lime);
+}
+
+/* Floating bubbles behind the page, so the glass panels have something to blur. */
+.bubbles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bubbles span {
+  position: absolute;
+  border-radius: 50%;
+  animation: float 26s ease-in-out infinite alternate;
+}
+.bubbles span:nth-child(1) {
+  top: 8%;
+  left: 4%;
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-lime),
+    transparent 70%
+  );
+}
+.bubbles span:nth-child(2) {
+  top: 52%;
+  left: 70%;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-green),
+    transparent 70%
+  );
+  animation-duration: 32s;
+  animation-delay: -8s;
+}
+.bubbles span:nth-child(3) {
+  top: 70%;
+  left: 12%;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-orange),
+    transparent 70%
+  );
+  animation-duration: 22s;
+  animation-delay: -4s;
+}
+.bubbles span:nth-child(4) {
+  top: 14%;
+  left: 62%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-lime),
+    transparent 70%
+  );
+  animation-duration: 28s;
+  animation-delay: -12s;
+}
+.bubbles span:nth-child(5) {
+  top: 40%;
+  left: 36%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-orange),
+    transparent 70%
+  );
+  animation-duration: 24s;
+  animation-delay: -16s;
+}
+.bubbles span:nth-child(6) {
+  top: 82%;
+  left: 52%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--bubble-green),
+    transparent 70%
+  );
+  animation-duration: 30s;
+  animation-delay: -20s;
+}
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(60px, -80px) scale(1.08);
+  }
+  100% {
+    transform: translate(-50px, 40px) scale(0.95);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubbles span {
+    animation: none;
+  }
 }

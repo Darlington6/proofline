@@ -72,6 +72,8 @@ export default function Home() {
             <a
               className="text-link"
               href="https://solana.com/docs/intro/quick-start"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Read the Solana quick start <span aria-hidden="true">→</span>
             </a>
