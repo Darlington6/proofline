@@ -28,6 +28,7 @@ Anyone:  /receipts?receipt=<sig>&tx=<sig> -> fetch both from Devnet,
 - Solana Kit client with Wallet Standard discovery (no legacy wallet adapter)
 - `src/lib/client/scenarios.ts` builds real Devnet transactions with `@solana-program/system` and `@solana-program/token`
 - `src/lib/client/sign.ts` signs the exact transaction that was checked. When the wallet returns the signed transaction, Proofline compares the message bytes. If the wallet changed anything, Proofline re-checks the wallet's version (`src/lib/analysis/compare.ts`) and sends it only if it is no riskier, still simulates, and costs at most 0.001 SOL more.
+- `src/lib/client/refresh.ts` swaps an unsigned transaction's blockhash for a fresh one, leaving everything else unchanged. A blockhash expires after about a minute, so when the user saves a receipt or signs a check older than 30 seconds, Proofline refreshes the transaction, checks it again, and continues only if it still simulates and is no riskier. Durable-nonce transactions are left alone. Once a receipt is saved, signing uses that exact transaction and never refreshes it.
 - `src/lib/client/receipt.ts` builds the proof receipt transaction.
 - `src/components/analysis-report.tsx` renders the same report for pre-signing checks, confirmed results, and historical lookups
 

@@ -76,7 +76,7 @@ The AI explains; it does not decide alone.
 - Final risk is the higher of the rules engine and the model. The model can catch something the rules miss, but it cannot talk a dangerous transaction down.
 - Without a key, or when the provider fails or the per-client AI limit is reached, the rules engine answers and the page says so.
 
-Any OpenAI-compatible chat completions provider works. See [docs/SETUP.md](docs/SETUP.md#optional-ai-explanations).
+The live demo uses Google Gemini (free tier). Any OpenAI-compatible chat completions provider works. See [docs/SETUP.md](docs/SETUP.md#optional-ai-explanations).
 
 ## Risk categories
 
@@ -109,7 +109,7 @@ Open [localhost:3000](http://localhost:3000). The app works without an AI key. F
 npm run validate   # format, typecheck, lint, tests, production build
 ```
 
-45 tests cover the decoder, the rules engine, simulation inspection (with a mocked RPC), AI fallbacks and the never-lower rule, wallet-modified transactions, receipt verification, and rate limits. CI runs the same command on every push.
+50 tests cover the decoder, the rules engine, simulation inspection (with a mocked RPC), AI fallbacks and the never-lower rule, wallet-modified transactions, receipt verification, signing errors, blockhash refresh, and rate limits. CI runs the same command on every push.
 
 Server routes have per-client rate limits, RPC and model calls have timeouts, and the server computes every analysis itself instead of trusting the browser.
 
@@ -118,6 +118,7 @@ Server routes have per-client rate limits, RPC and model calls have timeouts, an
 - **Devnet only.** Proofline is built and tested for Devnet.
 - **Simulation is a prediction.** Account state can change between the check and the signature. The post-signing review shows what really happened.
 - **Receipts commit to the transaction and risk level**, not to the full explanation text.
+- **Transactions expire after about a minute.** You can read for as long as you like: when you save a receipt or sign, Proofline gives a check older than 30 seconds a fresh blockhash, checks it again, and continues only if the risk is no higher. If more than a minute passes between saving a receipt and signing, the receipt's transaction expires and you save a new one.
 - **Historical lookups** cannot show delegate changes, because the RPC does not record them for past transactions.
 - **Rate limits are per server instance**, so they stop bursts rather than enforcing an exact global total.
 

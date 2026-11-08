@@ -48,12 +48,13 @@ Over a request limit, the API returns HTTP 429 with `Retry-After`. Over the AI l
 
 Add these values under **Settings → Environment Variables** and redeploy:
 
-| Name             | Value                                    |
-| ---------------- | ---------------------------------------- |
-| `OPENAI_API_KEY` | your provider key (mark it as Sensitive) |
-| `OPENAI_MODEL`   | `gpt-4o-mini`                            |
+| Name          | Value                                                     |
+| ------------- | --------------------------------------------------------- |
+| `AI_API_KEY`  | your provider key (mark it as Sensitive)                  |
+| `AI_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` |
+| `AI_MODEL`    | `gemini-3.5-flash-lite`                                   |
 
-For another OpenAI-compatible provider, use `AI_API_KEY`, `AI_BASE_URL`, and `AI_MODEL` instead. Never prefix a secret with `NEXT_PUBLIC_`, because that would expose it in the browser.
+These are the values for Google Gemini, which the live demo uses. For OpenAI, set `OPENAI_API_KEY` and `OPENAI_MODEL` instead. Never prefix a secret with `NEXT_PUBLIC_`, because that would expose it in the browser.
 
 ## 4. Deploy
 

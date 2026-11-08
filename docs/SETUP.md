@@ -108,26 +108,21 @@ Proofline works without a model provider. In that mode, the application uses its
 
 To enable model-backed explanations:
 
-1. Create an account with an OpenAI-compatible provider and create an API key from its dashboard.
+1. Create an API key with any provider that offers an OpenAI-compatible chat completions API. The live demo uses Google Gemini, which has a free tier: sign in at [Google AI Studio](https://aistudio.google.com/apikey) and select **Create API key**. No billing is needed.
 2. Keep the key only in your local `.env` file. Do not paste it into the browser, source code, GitHub, or a chat message.
 3. Add the values below and restart `npm run dev`:
 
    ```env
-   OPENAI_API_KEY=your_private_key
-   OPENAI_MODEL=gpt-4o-mini
+   AI_API_KEY=your_gemini_key
+   AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
+   AI_MODEL=gemini-3.5-flash-lite
    ```
 
-The key is read only by the server-side `/api/explain` route. Check the provider's pricing and usage limits before enabling it. An API key is not required for the hackathon demo because the rules-based path remains available.
+   For OpenAI itself, set `OPENAI_API_KEY` and `OPENAI_MODEL=gpt-4o-mini` instead.
 
-OpenAI-compatible providers can use the alternate variables:
+The key is read only on the server, by the check and lookup API routes. An API key is not required for the demo, because the rules-based path remains available.
 
-```env
-AI_API_KEY=your_provider_key
-AI_BASE_URL=https://your-provider.example/v1
-AI_MODEL=your-provider-model
-```
-
-A Muse Code or coding-assistant key will work only if that product provides an API endpoint compatible with OpenAI Chat Completions. A key intended only for the Muse Code editor cannot be used by Proofline; in that case, keep the rules-based explanation or use an API key from a model provider.
+Free tiers allow a limited number of requests per minute and per day. When the limit is reached, Proofline falls back to the rules engine and labels the result, so checks keep working.
 
 If the UI still says **Rules-based explanation** after adding the key, stop and restart `npm run dev`. Next.js reads `.env` when the server starts. An invalid key, unavailable model, provider error, or malformed model response also intentionally falls back to the rules engine.
 
