@@ -180,8 +180,12 @@ function Result({ result }: { result: Awaited<ReturnType<typeof load>> }) {
   );
 }
 
-export default async function ReceiptsPage(props: PageProps<"/receipts">) {
-  const query = await props.searchParams;
+export default async function ReceiptsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await searchParams;
   const receipt = first(query.receipt);
   const tx = first(query.tx);
   const result = receipt ? await load(receipt, tx) : null;
