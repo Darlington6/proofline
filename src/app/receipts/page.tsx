@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { verifyReceipt, type ReceiptVerification } from "@/lib/server/receipts";
+import { headers } from "next/headers";
+import { clientKey, lookupLimiter } from "@/lib/server/rate-limit";
 import { InputError } from "@/lib/server/rpc";
 
 export const metadata: Metadata = {
@@ -29,6 +31,13 @@ async function load(
   receipt: string,
   tx?: string,
 ): Promise<ReceiptVerification | { status: "error"; message: string }> {
+  const retryAfter = lookupLimiter.take(clientKey(await headers()));
+  if (retryAfter) {
+    return {
+      status: "error",
+      message: `Too many lookups. Try again in ${retryAfter} seconds.`,
+    };
+  }
   try {
     return await verifyReceipt(receipt, tx);
   } catch (error) {

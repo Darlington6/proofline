@@ -123,7 +123,8 @@ export type TransactionAnalysis = {
 
 export type Explanation = {
   provider: "rules" | "model";
-  fallbackReason?: "missing-key" | "provider-error" | "invalid-response";
+  fallbackReason?:
+    "missing-key" | "provider-error" | "invalid-response" | "rate-limited";
   summary: string;
   recommendation: string;
   findings: string[];

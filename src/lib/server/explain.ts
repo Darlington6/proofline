@@ -4,6 +4,7 @@ import type {
   RiskLevel,
   TransactionAnalysis,
 } from "@/lib/analysis/types";
+import { modelClientLimiter, modelGlobalLimiter } from "./rate-limit";
 
 const MODEL_TIMEOUT_MS = 15_000;
 const MAX_FINDINGS = 8;
@@ -149,6 +150,8 @@ export function parseModelResponse(content: string) {
 /** Rules always run. The model, when configured, can only raise the risk. */
 export async function explain(
   analysis: TransactionAnalysis,
+  /** Client identifier for the AI budget. Omit to skip the budget check. */
+  client?: string,
 ): Promise<{ explanation: Explanation; riskLevel: RiskLevel }> {
   const fallback = rulesExplanation(analysis);
   const rulesRisk = analysis.riskLevel;
@@ -158,6 +161,18 @@ export async function explain(
   if (!apiKey) {
     return {
       explanation: { ...fallback, fallbackReason: "missing-key" },
+      riskLevel: rulesRisk,
+    };
+  }
+
+  // The safety check never waits on the AI budget: over the limit, the
+  // rules engine answers instead.
+  if (
+    client !== undefined &&
+    (modelClientLimiter.take(client) > 0 || modelGlobalLimiter.take("all") > 0)
+  ) {
+    return {
+      explanation: { ...fallback, fallbackReason: "rate-limited" },
       riskLevel: rulesRisk,
     };
   }

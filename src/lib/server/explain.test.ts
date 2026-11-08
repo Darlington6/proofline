@@ -110,6 +110,18 @@ describe("explain", () => {
     expect(result.explanation.raisedRisk).toBe(true);
   });
 
+  it("answers with the rules once a client uses up its AI budget", async () => {
+    vi.stubEnv("OPENAI_API_KEY", "key");
+    mockModel({ ...modelAnswer, riskLevel: "low" });
+    const reasons = [];
+    for (let i = 0; i < 9; i++) {
+      const result = await explain(analysis("low"), "budget-test-client");
+      reasons.push(result.explanation.fallbackReason);
+    }
+    expect(reasons.slice(0, 8)).toEqual(Array(8).fill(undefined));
+    expect(reasons[8]).toBe("rate-limited");
+  });
+
   it("falls back to the rules when the provider is unreachable", async () => {
     vi.stubEnv("OPENAI_API_KEY", "key");
     vi.stubGlobal(

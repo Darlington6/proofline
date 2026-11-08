@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import type { CheckResult } from "@/lib/analysis/types";
 import { explain } from "@/lib/server/explain";
 import { inspectUnsignedTransaction } from "@/lib/server/inspect";
+import {
+  checkLimiter,
+  clientKey,
+  tooManyRequests,
+} from "@/lib/server/rate-limit";
 import { errorResponse } from "@/lib/server/responses";
 
 /**
@@ -9,6 +14,10 @@ import { errorResponse } from "@/lib/server/responses";
  * Body: { transaction: base64 string, wallet?: connected wallet address }
  */
 export async function POST(request: Request) {
+  const client = clientKey(request.headers);
+  const retryAfter = checkLimiter.take(client);
+  if (retryAfter) return tooManyRequests(retryAfter);
+
   const body = (await request.json().catch(() => null)) as {
     transaction?: unknown;
     wallet?: unknown;
@@ -27,7 +36,10 @@ export async function POST(request: Request) {
       body.transaction,
       wallet,
     );
-    const { explanation, riskLevel } = await explain(inspection.analysis);
+    const { explanation, riskLevel } = await explain(
+      inspection.analysis,
+      client,
+    );
     const result: CheckResult = { ...inspection, explanation, riskLevel };
     return NextResponse.json(result);
   } catch (error) {

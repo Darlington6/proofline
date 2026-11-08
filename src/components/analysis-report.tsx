@@ -45,6 +45,8 @@ const FALLBACK_TEXT: Record<
     "The AI model could not be reached, so this explanation comes from the rules engine.",
   "invalid-response":
     "The AI model returned an unusable answer, so this explanation comes from the rules engine.",
+  "rate-limited":
+    "The AI explanation limit was reached for now, so this explanation comes from the rules engine.",
 };
 
 export function AnalysisReport({
